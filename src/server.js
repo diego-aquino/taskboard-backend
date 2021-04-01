@@ -1,9 +1,11 @@
+import 'dotenv/config';
+
 import app from './app';
 import router from './router';
+import config from './config';
 
 app.use(router);
 
-const PORT = 3333;
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}...`);
+app.listen(config.serverPort, () => {
+  console.log(`Server is listening on port ${config.serverPort}...`);
 });
