@@ -2,5 +2,8 @@ module.exports = {
   clearMocks: true,
   coverageProvider: 'v8',
   testEnvironment: 'node',
-  transformIgnorePatterns: ['<rootDir>/src', '<rootDir>/tests'],
+  moduleNameMapper: {
+    '^~/(.*)': '<rootDir>/src/$1',
+    '^~/tests/(.*)': '<rootDir>/tests/$1',
+  },
 };

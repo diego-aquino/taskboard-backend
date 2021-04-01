@@ -9,5 +9,15 @@
       }
     ]
   ],
-  "ignore": ["**/*.test.js"]
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "~": "./src",
+          "~/tests": "./tests"
+        }
+      }
+    ]
+  ]
 }

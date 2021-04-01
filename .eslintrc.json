@@ -12,7 +12,18 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier"],
+  "settings": {
+    "import/resolver": {
+      "alias": {
+        "map": [
+          ["~", "./src"],
+          ["~/tests/*", "./tests/*"]
+        ],
+        "extensions": [".js", ".json"]
+      }
+    }
+  },
+  "plugins": ["prettier", "import"],
   "rules": {
     "prettier/prettier": "error",
 
