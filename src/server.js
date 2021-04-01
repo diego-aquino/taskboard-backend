@@ -1,11 +1,16 @@
+import express from 'express';
+import cors from 'cors';
 import 'dotenv/config';
 
-import app from './app';
-import router from './router';
+import routes from './routes';
 import config from './config';
 
-app.use(router);
+const server = express();
+server.use(express.json());
+server.use(cors());
 
-app.listen(config.serverPort, () => {
+server.use(routes);
+
+server.listen(config.serverPort, () => {
   console.log(`Server is listening on port ${config.serverPort}...`);
 });
