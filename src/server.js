@@ -4,11 +4,13 @@ import 'dotenv/config';
 
 import routes from '~/routes';
 import config from '~/config';
-import '~/database';
+import database from '~/database';
 
 const server = express();
 server.use(express.json());
 server.use(cors());
+
+database.connect();
 
 server.use(routes);
 
