@@ -18,6 +18,7 @@
           "~/tests": "./tests"
         }
       }
-    ]
+    ],
+    "@babel/plugin-proposal-class-properties"
   ]
 }
