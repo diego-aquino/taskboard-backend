@@ -1,0 +1,6 @@
+{
+  "verbose": false,
+  "ignore": ["./tests", "./node_modules", "./dist"],
+  "watch": ["./src"],
+  "exec": "babel-node --extensions \".js\" ./src/server.js"
+}
