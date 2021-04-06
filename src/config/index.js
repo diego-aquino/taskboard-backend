@@ -4,7 +4,7 @@ const environment = process.env.NODE_ENV || 'development';
 
 const config = {
   environment,
-  serverPort: parseInt(process.env.SERVER_PORT) || 3333,
+  serverPort: parseInt(process.env.PORT) || 3333,
   database: generateDatabaseConfig(environment),
 };
 
