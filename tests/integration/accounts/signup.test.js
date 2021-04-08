@@ -28,6 +28,8 @@ describe('`/accounts/signup` endpoint', () => {
         lastName: fixture.lastName,
         email: fixture.email,
       },
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String),
     });
 
     const accountId = response.body.account.id;
