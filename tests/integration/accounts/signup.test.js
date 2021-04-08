@@ -94,4 +94,25 @@ describe('`/accounts/signup` endpoint', () => {
     const accountsCreated = await Account.find({});
     expect(accountsCreated.length).toBe(0);
   });
+
+  it('should not create an account if any required fields are empty or missing', async () => {
+    const errorResponses = await Promise.all([
+      request(app).post('/accounts/signup').send({
+        firstName: '',
+        lastName: '',
+        email: '',
+      }),
+      request(app).post('/accounts/signup').send({}),
+    ]);
+
+    errorResponses.forEach((response) => {
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        message: 'Invalid or missing required field(s).',
+      });
+    });
+
+    const accountsCreated = await Account.find({});
+    expect(accountsCreated.length).toBe(0);
+  });
 });
