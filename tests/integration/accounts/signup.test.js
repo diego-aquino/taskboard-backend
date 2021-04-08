@@ -68,4 +68,16 @@ describe('`/accounts/signup` endpoint', () => {
     const accountsWithEmail = await Account.find({ email: fixture.email });
     expect(accountsWithEmail.length).toBe(1);
   });
+
+  it('should not create an account if email is not valid', async () => {
+    const response = await request(app)
+      .post('/accounts/signup')
+      .send({ ...fixture, email: 'some-invalid-email' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ message: 'Invalid email.' });
+
+    const accountsCreated = await Account.find({});
+    expect(accountsCreated.length).toBe(0);
+  });
 });

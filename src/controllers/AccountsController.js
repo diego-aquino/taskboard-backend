@@ -1,7 +1,9 @@
+import { ValidationError } from 'yup';
+
 import AccountsServices from '~/services/accounts';
+import { EmailAlreadyInUseError } from '~/services/accounts/errors';
 import AuthServices from '~/services/auth';
 import { AccountsViews } from '~/views';
-import { EmailAlreadyInUseError } from '../services/accounts/errors';
 
 class AccountsController {
   static async signUp(request, response) {
@@ -33,6 +35,10 @@ class AccountsController {
 
     if (error instanceof EmailAlreadyInUseError) {
       return response.status(409).json({ message });
+    }
+
+    if (error instanceof ValidationError) {
+      return response.status(400).json({ message });
     }
 
     response.status(500).json({ message: 'Internal server error.' });
