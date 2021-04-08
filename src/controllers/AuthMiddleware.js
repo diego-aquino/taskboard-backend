@@ -10,11 +10,11 @@ class AuthMiddleware {
       request.locals.accountId = accountId;
       return next();
     } catch (error) {
-      return AuthMiddleware.#handleError(error, { request, response });
+      return AuthMiddleware.#handleError(error, { response, next });
     }
   }
 
-  static #handleError(error, { response }) {
+  static #handleError(error, { response, next }) {
     if (error instanceof TokenExpiredError) {
       return response.status(401).json({ message: 'Expired access token.' });
     }
@@ -25,8 +25,7 @@ class AuthMiddleware {
       });
     }
 
-    response.status(500).json({ message: 'Internal server error.' });
-    throw error;
+    return next(error);
   }
 }
 

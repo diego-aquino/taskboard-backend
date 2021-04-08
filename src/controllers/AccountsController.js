@@ -6,7 +6,7 @@ import AuthServices from '~/services/auth';
 import { AccountsViews } from '~/views';
 
 class AccountsController {
-  static async signUp(request, response) {
+  static async signUp(request, response, next) {
     try {
       const { firstName, lastName, email, password } = request.body;
       const accountInfo = { firstName, lastName, email, password };
@@ -26,11 +26,11 @@ class AccountsController {
         refreshToken,
       });
     } catch (error) {
-      return AccountsController.#handleError(error, { request, response });
+      return AccountsController.#handleError(error, { response, next });
     }
   }
 
-  static async details(request, response) {
+  static async details(request, response, next) {
     try {
       const { accountId } = request.locals;
 
@@ -43,11 +43,11 @@ class AccountsController {
 
       return response.status(200).json({ account: accountView });
     } catch (error) {
-      return AccountsController.#handleError(error, { request, response });
+      return AccountsController.#handleError(error, { response, next });
     }
   }
 
-  static #handleError(error, { response }) {
+  static #handleError(error, { response, next }) {
     const { message } = error;
 
     if (error instanceof EmailAlreadyInUseError) {
@@ -58,8 +58,7 @@ class AccountsController {
       return response.status(400).json({ message });
     }
 
-    response.status(500).json({ message: 'Internal server error.' });
-    throw error;
+    return next(error);
   }
 }
 
