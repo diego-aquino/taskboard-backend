@@ -29,7 +29,7 @@ class AccountsServices {
       firstName: yup.string().required(),
       lastName: yup.string().required(),
       email: yup.string().email().required(),
-      password: yup.string().required(),
+      password: yup.string().min(8, 'Password too short.').required(),
     });
 
     await accountInfoSchema.validate(accountInfo, {

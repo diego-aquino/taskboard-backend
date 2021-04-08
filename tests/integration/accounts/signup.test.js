@@ -80,4 +80,18 @@ describe('`/accounts/signup` endpoint', () => {
     const accountsCreated = await Account.find({});
     expect(accountsCreated.length).toBe(0);
   });
+
+  it('should not create an account if password is not 8-characters long', async () => {
+    const passwordTooShortResponse = await request(app)
+      .post('/accounts/signup')
+      .send({ ...fixture, password: '1234567' });
+
+    expect(passwordTooShortResponse.status).toBe(400);
+    expect(passwordTooShortResponse.body).toEqual({
+      message: 'Password too short.',
+    });
+
+    const accountsCreated = await Account.find({});
+    expect(accountsCreated.length).toBe(0);
+  });
 });
