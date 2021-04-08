@@ -26,11 +26,28 @@ class AccountsController {
         refreshToken,
       });
     } catch (error) {
-      return AccountsController.handleError(error, { request, response });
+      return AccountsController.#handleError(error, { request, response });
     }
   }
 
-  static handleError(error, { response }) {
+  static async details(request, response) {
+    try {
+      const { accountId } = request.locals;
+
+      const account = await AccountsServices.findById(accountId).lean();
+      if (!account) {
+        return response.status(404).json({ message: 'Account not found.' });
+      }
+
+      const accountView = AccountsViews.render(account);
+
+      return response.status(200).json({ account: accountView });
+    } catch (error) {
+      return AccountsController.#handleError(error, { request, response });
+    }
+  }
+
+  static #handleError(error, { response }) {
     const { message } = error;
 
     if (error instanceof EmailAlreadyInUseError) {

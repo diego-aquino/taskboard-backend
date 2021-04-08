@@ -7,3 +7,11 @@ export function generateToken(payload, secretKey, options) {
     );
   });
 }
+
+export function verifyToken(token, secretKey, options = {}) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, secretKey, options, (error, decoded) =>
+      error ? reject(error) : resolve(decoded),
+    );
+  });
+}
