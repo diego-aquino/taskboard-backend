@@ -47,4 +47,25 @@ describe('`/accounts/signup` endpoint', () => {
       }),
     );
   });
+
+  it('should not create an account if email already exists', async () => {
+    const response = await request(app).post('/accounts/signup').send(fixture);
+    expect(response.status).toBe(201);
+
+    const emailAlreadyInUseResponse = await request(app)
+      .post('/accounts/signup')
+      .send({
+        ...fixture,
+        firstName: 'OtherFirst',
+        lastName: 'OtherLast',
+        password: '87654321',
+      });
+    expect(emailAlreadyInUseResponse.status).toBe(409);
+    expect(emailAlreadyInUseResponse.body).toEqual({
+      message: 'Email is already in use.',
+    });
+
+    const accountsWithEmail = await Account.find({ email: fixture.email });
+    expect(accountsWithEmail.length).toBe(1);
+  });
 });
