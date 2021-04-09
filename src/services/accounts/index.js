@@ -41,6 +41,10 @@ class AccountsServices {
   static findById(accountId) {
     return Account.findById(accountId);
   }
+
+  static existsWithId(accountId) {
+    return Account.exists({ _id: accountId });
+  }
 }
 
 export default AccountsServices;
