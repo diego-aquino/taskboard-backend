@@ -37,6 +37,10 @@ class AccountsServices {
       stripUnknown: true,
     });
   }
+
+  static findById(accountId) {
+    return Account.findById(accountId);
+  }
 }
 
 export default AccountsServices;
