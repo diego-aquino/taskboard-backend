@@ -44,6 +44,10 @@ class TasksServices {
 
     return Task.findOne(filters);
   }
+
+  static findByOwner(owner) {
+    return Task.find({ owner });
+  }
 }
 
 export default TasksServices;

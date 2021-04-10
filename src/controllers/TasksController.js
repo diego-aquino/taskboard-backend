@@ -1,5 +1,6 @@
 import { ValidationError } from 'yup';
 
+import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
 import TasksServices from '~/services/tasks';
 import { TaskNotFoundError } from '~/services/tasks/errors';
@@ -38,6 +39,24 @@ class TasksController {
       const taskView = TasksViews.render(task);
 
       return response.status(200).json({ task: taskView });
+    } catch (error) {
+      return TasksController.#handleError(error, { response, next });
+    }
+  }
+
+  static async list(request, response, next) {
+    try {
+      const { accountId } = request.locals;
+
+      const accountExists = await AccountsServices.existsWithId(accountId);
+      if (!accountExists) {
+        throw new AccountNotFoundError();
+      }
+
+      const tasks = await TasksServices.findByOwner(accountId).lean();
+      const taskViews = TasksViews.renderMany(tasks);
+
+      return response.status(200).json({ tasks: taskViews });
     } catch (error) {
       return TasksController.#handleError(error, { response, next });
     }
