@@ -2,8 +2,7 @@ import request from 'supertest';
 
 import app from '~/app';
 import database from '~/database';
-import Task from '~/models/Task';
-import Account from '~/models/Account';
+import { Account, Task } from '~/models';
 import { registerFixtureAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);

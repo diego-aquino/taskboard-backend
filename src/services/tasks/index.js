@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import Task from '~/models/Task';
+import { Task } from '~/models';
 import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
 

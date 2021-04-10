@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import app from '~/app';
 import database from '~/database';
-import Account from '~/models/Account';
+import { Account } from '~/models';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);

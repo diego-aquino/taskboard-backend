@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import Account from '~/models/Account';
+import { Account } from '~/models';
 import { EmailAlreadyInUseError } from './errors';
 
 class AccountsServices {
