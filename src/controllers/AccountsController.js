@@ -1,7 +1,10 @@
 import { ValidationError } from 'yup';
 
 import AccountsServices from '~/services/accounts';
-import { EmailAlreadyInUseError } from '~/services/accounts/errors';
+import {
+  AccountNotFoundError,
+  EmailAlreadyInUseError,
+} from '~/services/accounts/errors';
 import AuthServices from '~/services/auth';
 import { AccountsViews } from '~/views';
 
@@ -36,7 +39,7 @@ class AccountsController {
 
       const account = await AccountsServices.findById(accountId).lean();
       if (!account) {
-        return response.status(404).json({ message: 'Account not found.' });
+        throw new AccountNotFoundError();
       }
 
       const accountView = AccountsViews.render(account);
@@ -52,6 +55,10 @@ class AccountsController {
 
     if (error instanceof EmailAlreadyInUseError) {
       return response.status(409).json({ message });
+    }
+
+    if (error instanceof AccountNotFoundError) {
+      return response.status(404).json({ message });
     }
 
     if (error instanceof ValidationError) {

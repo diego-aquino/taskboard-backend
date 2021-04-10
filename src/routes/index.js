@@ -1,11 +1,13 @@
 import { Router } from 'express';
 
 import accountsRoutes from './accountsRoutes';
+import tasksRoutes from './tasksRoutes';
 
 const routes = Router();
 routes.use(initializeRequestLocals);
 
 routes.use(accountsRoutes);
+routes.use(tasksRoutes);
 
 routes.use(handleUncaughtErrors);
 

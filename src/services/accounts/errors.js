@@ -4,3 +4,9 @@ export class EmailAlreadyInUseError extends Error {
     this.email = email;
   }
 }
+
+export class AccountNotFoundError extends Error {
+  constructor() {
+    super('Account not found.');
+  }
+}

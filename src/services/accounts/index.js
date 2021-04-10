@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-import Account from '~/models/Account';
+import { Account } from '~/models';
 import { EmailAlreadyInUseError } from './errors';
 
 class AccountsServices {
@@ -9,8 +9,8 @@ class AccountsServices {
 
     const { firstName, lastName, email, password } = accountInfo;
 
-    const accountWithSameEmail = await Account.findOne({ email });
-    if (accountWithSameEmail) {
+    const accountWithSameEmailExists = await Account.exists({ email });
+    if (accountWithSameEmailExists) {
       throw new EmailAlreadyInUseError(email);
     }
 
@@ -40,6 +40,10 @@ class AccountsServices {
 
   static findById(accountId) {
     return Account.findById(accountId);
+  }
+
+  static existsWithId(accountId) {
+    return Account.exists({ _id: accountId });
   }
 }
 
