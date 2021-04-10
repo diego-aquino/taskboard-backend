@@ -9,8 +9,8 @@ class AccountsServices {
 
     const { firstName, lastName, email, password } = accountInfo;
 
-    const accountWithSameEmail = await Account.findOne({ email });
-    if (accountWithSameEmail) {
+    const accountWithSameEmailExists = await Account.exists({ email });
+    if (accountWithSameEmailExists) {
       throw new EmailAlreadyInUseError(email);
     }
 

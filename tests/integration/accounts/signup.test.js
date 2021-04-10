@@ -65,7 +65,9 @@ describe('`/accounts/signup` endpoint', () => {
       message: 'Email is already in use.',
     });
 
-    const accountsWithEmail = await Account.find({ email: fixture.email });
+    const accountsWithEmail = await Account.find({
+      email: fixture.email,
+    }).lean();
     expect(accountsWithEmail.length).toBe(1);
   });
 
@@ -77,7 +79,7 @@ describe('`/accounts/signup` endpoint', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ message: 'Invalid email.' });
 
-    const accountsCreated = await Account.find({});
+    const accountsCreated = await Account.find({}).lean();
     expect(accountsCreated.length).toBe(0);
   });
 
@@ -91,7 +93,7 @@ describe('`/accounts/signup` endpoint', () => {
       message: 'Password too short.',
     });
 
-    const accountsCreated = await Account.find({});
+    const accountsCreated = await Account.find({}).lean();
     expect(accountsCreated.length).toBe(0);
   });
 
@@ -112,7 +114,7 @@ describe('`/accounts/signup` endpoint', () => {
       });
     });
 
-    const accountsCreated = await Account.find({});
+    const accountsCreated = await Account.find({}).lean();
     expect(accountsCreated.length).toBe(0);
   });
 });
