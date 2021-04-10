@@ -15,23 +15,21 @@ describe('`POST /tasks` endpoint', () => {
   };
   const account = {};
 
-  function createTaskRequest(options = {}) {
-    const { authenticated = true } = options;
-
-    const ongoingRequest = request(app).post('/tasks');
-
-    return authenticated
-      ? ongoingRequest.set('Authorization', `Bearer ${account.accessToken}`)
-      : ongoingRequest;
-  }
-
   beforeEach(async () => {
     await Promise.all([Task.deleteMany({}), Account.deleteMany({})]);
     Object.assign(account, await registerMockAccount());
   });
 
+  function createTaskRequest(accessToken) {
+    const ongoingRequest = request(app).post('/tasks');
+
+    return accessToken
+      ? ongoingRequest.set('Authorization', `Bearer ${accessToken}`)
+      : ongoingRequest;
+  }
+
   it('should support creating new tasks related to existing accounts', async () => {
-    const response = await createTaskRequest().send(fixture);
+    const response = await createTaskRequest(account.accessToken).send(fixture);
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual({
@@ -64,14 +62,14 @@ describe('`POST /tasks` endpoint', () => {
   it('should not create a task related to a non-existing account', async () => {
     await Account.findByIdAndDelete(account.id);
 
-    const response = await createTaskRequest().send(fixture);
+    const response = await createTaskRequest(account.accessToken).send(fixture);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ message: 'Account not found.' });
   });
 
   it('should not create a task if priority is unknown', async () => {
-    const response = await createTaskRequest().send({
+    const response = await createTaskRequest(account.accessToken).send({
       ...fixture,
       priority: 'some-unknown-priority',
     });
@@ -81,7 +79,7 @@ describe('`POST /tasks` endpoint', () => {
   });
 
   it('should create a task with default priority if it was not specified', async () => {
-    const response = await createTaskRequest().send({
+    const response = await createTaskRequest(account.accessToken).send({
       ...fixture,
       priority: undefined,
     });
@@ -98,8 +96,8 @@ describe('`POST /tasks` endpoint', () => {
 
   it('should not create a task if any required fields are empty or missing', async () => {
     const errorResponses = await Promise.all([
-      createTaskRequest().send({ name: '' }),
-      createTaskRequest().send({}),
+      createTaskRequest(account.accessToken).send({ name: '' }),
+      createTaskRequest(account.accessToken).send({}),
     ]);
 
     errorResponses.forEach((response) => {
@@ -111,9 +109,7 @@ describe('`POST /tasks` endpoint', () => {
   });
 
   it('should not create a task if the user is not authenticated', async () => {
-    const response = await createTaskRequest({ authenticated: false }).send(
-      fixture,
-    );
+    const response = await createTaskRequest().send(fixture);
 
     expect(response.status).toBe(401);
     expect(response.body).toEqual({

@@ -15,6 +15,11 @@ describe('`GET /tasks/:taskId` endpoint', () => {
   const task = {};
   const account = {};
 
+  beforeAll(async () => {
+    Object.assign(account, await registerMockAccount());
+    Object.assign(task, await registerMockTask(account));
+  });
+
   function getTaskRequest(taskId, accessToken) {
     const ongoingRequest = request(app).get(`/tasks/${taskId}`);
 
@@ -22,11 +27,6 @@ describe('`GET /tasks/:taskId` endpoint', () => {
       ? ongoingRequest.set('Authorization', `Bearer ${accessToken}`)
       : ongoingRequest;
   }
-
-  beforeAll(async () => {
-    Object.assign(account, await registerMockAccount());
-    Object.assign(task, await registerMockTask(account));
-  });
 
   it('should return the details of an existing task', async () => {
     const response = await getTaskRequest(task.id, account.accessToken);
