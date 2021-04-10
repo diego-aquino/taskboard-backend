@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Account } from '~/models';
-import { registerFixtureAccount } from '~tests/utils/integration';
+import { registerMockAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -12,7 +12,7 @@ describe('`/accounts/details` endpoint', () => {
   beforeEach(async () => Account.deleteMany({}));
 
   it('should return the details of an existing account', async () => {
-    const account = await registerFixtureAccount();
+    const account = await registerMockAccount();
 
     const response = await request(app)
       .get('/accounts/details')
@@ -30,7 +30,7 @@ describe('`/accounts/details` endpoint', () => {
   });
 
   it('should not return details of a non-existing account', async () => {
-    const account = await registerFixtureAccount();
+    const account = await registerMockAccount();
     await Account.deleteOne({ email: account.email });
 
     const response = await request(app)

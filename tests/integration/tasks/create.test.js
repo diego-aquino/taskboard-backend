@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Account, Task } from '~/models';
-import { registerFixtureAccount } from '~tests/utils/integration';
+import { registerMockAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -27,7 +27,7 @@ describe('`POST /tasks` endpoint', () => {
 
   beforeEach(async () => {
     await Promise.all([Task.deleteMany({}), Account.deleteMany({})]);
-    Object.assign(account, await registerFixtureAccount());
+    Object.assign(account, await registerMockAccount());
   });
 
   it('should support creating new tasks related to existing accounts', async () => {

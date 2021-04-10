@@ -33,6 +33,17 @@ class TasksServices {
       stripUnknown: true,
     });
   }
+
+  static findById(taskId, options = {}) {
+    const { owner } = options;
+    const filters = { _id: taskId, owner };
+
+    if (owner === undefined) {
+      delete filters.owner;
+    }
+
+    return Task.findOne(filters);
+  }
 }
 
 export default TasksServices;
