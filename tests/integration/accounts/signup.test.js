@@ -11,7 +11,7 @@ describe('`/accounts/signup` endpoint', () => {
   const fixture = {
     firstName: 'First',
     lastName: 'Last',
-    email: 'account@example.com',
+    email: 'signup.account@example.com',
     password: '12345678',
   };
 

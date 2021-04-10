@@ -16,7 +16,10 @@ describe('`GET /tasks/:taskId` endpoint', () => {
   const account = {};
 
   beforeAll(async () => {
-    Object.assign(account, await registerMockAccount());
+    Object.assign(
+      account,
+      await registerMockAccount({ email: 'get.tasks@example.com' }),
+    );
     Object.assign(task, await registerMockTask(account));
   });
 
@@ -55,7 +58,7 @@ describe('`GET /tasks/:taskId` endpoint', () => {
 
   it('should not return details of a task related to another account', async () => {
     const otherAccount = await registerMockAccount({
-      email: 'otheraccount@example.com',
+      email: 'other.get.tasks@example.com',
     });
 
     const response = await getTaskRequest(task.id, otherAccount.accessToken);
