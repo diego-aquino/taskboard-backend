@@ -30,6 +30,11 @@ class TasksController {
       const { accountId } = request.locals;
       const { taskId } = request.params;
 
+      const accountExists = await AccountsServices.existsWithId(accountId);
+      if (!accountExists) {
+        throw new AccountNotFoundError();
+      }
+
       const task = await TasksServices.findById(taskId, {
         owner: accountId,
       }).lean();
