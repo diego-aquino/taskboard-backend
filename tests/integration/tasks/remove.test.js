@@ -53,6 +53,17 @@ describe('`DELETE /tasks/:taskId` endpoint', () => {
     expect(response.body).toEqual({ message: 'Task not found.' });
   });
 
+  it('should not remove a task owned by another account', async () => {
+    const otherAccount = await registerMockAccount({
+      email: 'other.remove.tasks@example.com',
+    });
+
+    const response = await removeTaskRequest(task.id, otherAccount.accessToken);
+
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ message: 'Task not found.' });
+  });
+
   it('should not remove a task if the user is not authenticated', async () => {
     const response = await removeTaskRequest();
 

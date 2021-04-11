@@ -87,16 +87,17 @@ class TasksController {
       const { accountId } = request.locals;
       const { taskId } = request.params;
 
-      const [accountExists, taskExists] = await Promise.all([
-        AccountsServices.existsWithId(accountId),
-        TasksServices.existsWithId(taskId),
-      ]);
-
+      const accountExists = await AccountsServices.existsWithId(accountId);
       if (!accountExists) {
         throw new AccountNotFoundError();
       }
 
-      if (!taskExists) {
+      const taskOwnedByAccountExists = await TasksServices.existsWithId(
+        taskId,
+        { owner: accountId },
+      );
+
+      if (!taskOwnedByAccountExists) {
         throw new TaskNotFoundError();
       }
 
