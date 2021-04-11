@@ -67,6 +67,14 @@ class TasksServices {
       })
       .sort({ __order: 1 });
   }
+
+  static existsWithId(taskId) {
+    return Task.exists({ _id: taskId });
+  }
+
+  static removeById(taskId) {
+    return Task.findByIdAndRemove(taskId);
+  }
 }
 
 export default TasksServices;
