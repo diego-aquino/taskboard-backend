@@ -9,11 +9,17 @@ beforeAll(database.connect);
 afterAll(database.disconnect);
 
 describe('`/accounts/details` endpoint', () => {
-  beforeEach(async () => Account.deleteMany({}));
+  const account = {};
+
+  beforeEach(async () => {
+    await Account.deleteMany({});
+    Object.assign(
+      account,
+      await registerMockAccount({ email: 'details.accounts@example.com' }),
+    );
+  });
 
   it('should return the details of an existing account', async () => {
-    const account = await registerMockAccount();
-
     const response = await request(app)
       .get('/accounts/details')
       .set('Authorization', `Bearer ${account.accessToken}`);
@@ -30,7 +36,6 @@ describe('`/accounts/details` endpoint', () => {
   });
 
   it('should not return details of a non-existing account', async () => {
-    const account = await registerMockAccount();
     await Account.deleteOne({ email: account.email });
 
     const response = await request(app)

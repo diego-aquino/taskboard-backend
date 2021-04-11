@@ -5,6 +5,10 @@ class TasksViews {
     const taskView = { id, name, priority, owner, createdAt, updatedAt };
     return taskView;
   }
+
+  static renderMany(tasks) {
+    return tasks.map(TasksViews.render);
+  }
 }
 
 export default TasksViews;
