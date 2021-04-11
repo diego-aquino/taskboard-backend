@@ -1,8 +1,14 @@
+import mongoose from 'mongoose';
 import * as yup from 'yup';
 
 import { Task } from '~/models';
 import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
+
+const taskPriorityOrders = {
+  asc: ['low', 'high'],
+  desc: ['high', 'low'],
+};
 
 class TasksServices {
   static async create(taskInfo, accountId) {
@@ -45,8 +51,21 @@ class TasksServices {
     return Task.findOne(filters);
   }
 
-  static findByOwner(owner) {
-    return Task.find({ owner });
+  static findByOwner(owner, options = {}) {
+    const { sortByPriority } = options;
+    const prioritySortingOrder = taskPriorityOrders[sortByPriority];
+
+    if (!prioritySortingOrder) {
+      return Task.find({ owner });
+    }
+
+    const ownerObjectId = mongoose.Types.ObjectId(owner);
+    return Task.aggregate()
+      .match({ owner: ownerObjectId })
+      .addFields({
+        __order: { $indexOfArray: [prioritySortingOrder, '$priority'] },
+      })
+      .sort({ __order: 1 });
   }
 }
 

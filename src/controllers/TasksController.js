@@ -1,10 +1,12 @@
-import { ValidationError } from 'yup';
+import * as yup from 'yup';
 
 import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
 import TasksServices from '~/services/tasks';
 import { TaskNotFoundError } from '~/services/tasks/errors';
 import TasksViews from '~/views/TasksViews';
+
+const { ValidationError } = yup;
 
 class TasksController {
   static async create(request, response, next) {
@@ -47,19 +49,37 @@ class TasksController {
   static async list(request, response, next) {
     try {
       const { accountId } = request.locals;
+      const { sortByPriority } = await TasksController.#validateListQuery(
+        request.query,
+      );
 
       const accountExists = await AccountsServices.existsWithId(accountId);
       if (!accountExists) {
         throw new AccountNotFoundError();
       }
 
-      const tasks = await TasksServices.findByOwner(accountId).lean();
+      const tasks = await TasksServices.findByOwner(accountId, {
+        sortByPriority,
+      });
       const taskViews = TasksViews.renderMany(tasks);
 
       return response.status(200).json({ tasks: taskViews });
     } catch (error) {
       return TasksController.#handleError(error, { response, next });
     }
+  }
+
+  static #validateListQuery(requestQuery) {
+    const requestQuerySchema = yup.object({
+      sortByPriority: yup
+        .string()
+        .oneOf(['asc', 'desc', undefined], 'Invalid sorting order.'),
+    });
+
+    return requestQuerySchema.validate(requestQuery, {
+      abortEarly: true,
+      stripUnknown: true,
+    });
   }
 
   static #handleError(error, { response, next }) {
