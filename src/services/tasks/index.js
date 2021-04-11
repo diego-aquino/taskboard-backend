@@ -67,6 +67,21 @@ class TasksServices {
       })
       .sort({ __order: 1 });
   }
+
+  static existsWithId(taskId, options = {}) {
+    const { owner } = options;
+    const filters = { _id: taskId, owner };
+
+    if (owner === undefined) {
+      delete filters.owner;
+    }
+
+    return Task.exists(filters);
+  }
+
+  static removeById(taskId) {
+    return Task.findByIdAndRemove(taskId);
+  }
 }
 
 export default TasksServices;

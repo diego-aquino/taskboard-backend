@@ -82,6 +82,33 @@ class TasksController {
     });
   }
 
+  static async remove(request, response, next) {
+    try {
+      const { accountId } = request.locals;
+      const { taskId } = request.params;
+
+      const accountExists = await AccountsServices.existsWithId(accountId);
+      if (!accountExists) {
+        throw new AccountNotFoundError();
+      }
+
+      const taskOwnedByAccountExists = await TasksServices.existsWithId(
+        taskId,
+        { owner: accountId },
+      );
+
+      if (!taskOwnedByAccountExists) {
+        throw new TaskNotFoundError();
+      }
+
+      await TasksServices.removeById(taskId);
+
+      return response.status(204).send();
+    } catch (error) {
+      return TasksController.#handleError(error, { response, next });
+    }
+  }
+
   static #handleError(error, { response, next }) {
     const { message } = error;
 
