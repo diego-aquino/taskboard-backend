@@ -4,8 +4,8 @@ import AccountsServices from '~/services/accounts';
 import {
   AccountNotFoundError,
   EmailAlreadyInUseError,
+  InvalidLoginCredentials,
 } from '~/services/accounts/errors';
-import AuthServices from '~/services/auth';
 import { AccountsViews } from '~/views';
 
 class AccountsController {
@@ -14,20 +14,30 @@ class AccountsController {
       const { firstName, lastName, email, password } = request.body;
       const accountInfo = { firstName, lastName, email, password };
 
-      const createdAccount = await AccountsServices.create(accountInfo);
-      const accountId = createdAccount._id;
+      const {
+        account,
+        authCredentials: { accessToken, refreshToken },
+      } = await AccountsServices.create(accountInfo);
 
-      const accountView = AccountsViews.render(createdAccount.toObject());
-      const [accessToken, refreshToken] = await Promise.all([
-        AuthServices.generateAccountAccessToken(accountId),
-        AuthServices.generateAccountRefreshToken(accountId),
-      ]);
+      const accountView = AccountsViews.render(account.toObject());
 
       return response.status(201).json({
         account: accountView,
         accessToken,
         refreshToken,
       });
+    } catch (error) {
+      return AccountsController.#handleError(error, { response, next });
+    }
+  }
+
+  static async login(request, response, next) {
+    try {
+      const { email, password } = request.body;
+
+      const authCredentials = await AccountsServices.login({ email, password });
+
+      return response.status(201).json(authCredentials);
     } catch (error) {
       return AccountsController.#handleError(error, { response, next });
     }
@@ -59,6 +69,10 @@ class AccountsController {
 
     if (error instanceof AccountNotFoundError) {
       return response.status(404).json({ message });
+    }
+
+    if (error instanceof InvalidLoginCredentials) {
+      return response.status(401).json({ message });
     }
 
     if (error instanceof ValidationError) {
