@@ -30,6 +30,11 @@ class TasksController {
       const { accountId } = request.locals;
       const { taskId } = request.params;
 
+      const accountExists = await AccountsServices.existsWithId(accountId);
+      if (!accountExists) {
+        throw new AccountNotFoundError();
+      }
+
       const task = await TasksServices.findById(taskId, {
         owner: accountId,
       }).lean();
@@ -82,6 +87,32 @@ class TasksController {
     });
   }
 
+  static async update(request, response, next) {
+    try {
+      const { accountId } = request.locals;
+      const { taskId } = request.params;
+      const update = request.body;
+
+      const accountExists = await AccountsServices.existsWithId(accountId);
+      if (!accountExists) {
+        throw new AccountNotFoundError();
+      }
+
+      const taskExists = await TasksServices.existsWithId(taskId, {
+        owner: accountId,
+      });
+      if (!taskExists) {
+        throw new TaskNotFoundError();
+      }
+
+      await TasksServices.updateById(taskId, update, { owner: accountId });
+
+      return response.status(204).send();
+    } catch (error) {
+      return TasksController.#handleError(error, { response, next });
+    }
+  }
+
   static async remove(request, response, next) {
     try {
       const { accountId } = request.locals;
@@ -92,12 +123,10 @@ class TasksController {
         throw new AccountNotFoundError();
       }
 
-      const taskOwnedByAccountExists = await TasksServices.existsWithId(
-        taskId,
-        { owner: accountId },
-      );
-
-      if (!taskOwnedByAccountExists) {
+      const taskExists = await TasksServices.existsWithId(taskId, {
+        owner: accountId,
+      });
+      if (!taskExists) {
         throw new TaskNotFoundError();
       }
 
