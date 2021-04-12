@@ -24,6 +24,14 @@ const AccountSchema = new Schema({
     required: true,
     select: false,
   },
+  auth: {
+    activeRefreshToken: {
+      type: String,
+      nullable: true,
+      default: null,
+    },
+    select: false,
+  },
 });
 
 AccountSchema.pre('save', async function preSave(next) {

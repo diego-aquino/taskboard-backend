@@ -4,6 +4,7 @@ import AccountsServices from '~/services/accounts';
 import {
   AccountNotFoundError,
   EmailAlreadyInUseError,
+  InvalidLoginCredentials,
 } from '~/services/accounts/errors';
 import AuthServices from '~/services/auth';
 import { AccountsViews } from '~/views';
@@ -28,6 +29,18 @@ class AccountsController {
         accessToken,
         refreshToken,
       });
+    } catch (error) {
+      return AccountsController.#handleError(error, { response, next });
+    }
+  }
+
+  static async login(request, response, next) {
+    try {
+      const { email, password } = request.body;
+
+      const authCredentials = await AccountsServices.login({ email, password });
+
+      return response.status(201).json(authCredentials);
     } catch (error) {
       return AccountsController.#handleError(error, { response, next });
     }
@@ -59,6 +72,10 @@ class AccountsController {
 
     if (error instanceof AccountNotFoundError) {
       return response.status(404).json({ message });
+    }
+
+    if (error instanceof InvalidLoginCredentials) {
+      return response.status(401).json({ message });
     }
 
     if (error instanceof ValidationError) {
