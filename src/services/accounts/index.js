@@ -2,7 +2,11 @@ import * as yup from 'yup';
 
 import { Account } from '~/models';
 import AuthServices from '~/services/auth';
-import { EmailAlreadyInUseError, InvalidLoginCredentials } from './errors';
+import {
+  AccountNotFoundError,
+  EmailAlreadyInUseError,
+  InvalidLoginCredentials,
+} from './errors';
 
 class AccountsServices {
   static async create(accountInfo) {
@@ -87,6 +91,17 @@ class AccountsServices {
     });
 
     return loginCredentialsSchema.validate(credentials);
+  }
+
+  static async logout(accountId) {
+    const account = await Account.findById(accountId);
+
+    if (!account) {
+      throw new AccountNotFoundError();
+    }
+
+    account.auth.refreshToken = null;
+    await account.save();
   }
 
   static findById(accountId) {
