@@ -9,7 +9,7 @@ const config = {
   jwt: {
     accessSecretKey: process.env.JWT_ACCESS_SECRET_KEY,
     refreshSecretKey: process.env.JWT_REFRESH_SECRET_KEY,
-    sessionExpiresIn: '10m',
+    sessionExpiresIn: '5m',
   },
 };
 
