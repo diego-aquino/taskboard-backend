@@ -79,6 +79,31 @@ class TasksServices {
     return Task.exists(filters);
   }
 
+  static async updateById(taskId, update, options = {}) {
+    const { owner } = options;
+    const filters = { _id: taskId, owner };
+
+    if (owner === undefined) {
+      delete filters.owner;
+    }
+
+    const validatedUpdate = await TasksServices.#validateTaskUpdate(update);
+
+    return Task.findOneAndUpdate(filters, validatedUpdate);
+  }
+
+  static #validateTaskUpdate(update) {
+    const updateSchema = yup.object({
+      name: yup.string().min(1, 'Invalid field(s).'),
+      priority: yup.string().oneOf(['high', 'low'], 'Unknown priority.'),
+    });
+
+    return updateSchema.validate(update, {
+      abortEarly: true,
+      stripUnknown: true,
+    });
+  }
+
   static removeById(taskId) {
     return Task.findByIdAndRemove(taskId);
   }
