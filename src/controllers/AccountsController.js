@@ -43,6 +43,18 @@ class AccountsController {
     }
   }
 
+  static async logout(request, response, next) {
+    try {
+      const { accountId } = request.locals;
+
+      await AccountsServices.logout(accountId);
+
+      return response.status(204).send();
+    } catch (error) {
+      return AccountsController.#handleError(error, { response, next });
+    }
+  }
+
   static async details(request, response, next) {
     try {
       const { accountId } = request.locals;
