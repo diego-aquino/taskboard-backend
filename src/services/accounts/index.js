@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import bcrypt from 'bcrypt';
 
 import { Account } from '~/models';
 import AuthServices from '~/services/auth';
@@ -16,14 +15,22 @@ class AccountsServices {
       throw new EmailAlreadyInUseError(email);
     }
 
-    const createdAccount = await Account.create({
+    const account = await Account.create({
       firstName,
       lastName,
       email,
       password,
     });
 
-    return createdAccount;
+    const {
+      accessToken,
+      refreshToken,
+    } = await AuthServices.generateAuthCredentials(account.id);
+
+    return {
+      account,
+      authCredentials: { accessToken, refreshToken },
+    };
   }
 
   static async #validateAccountInfo(accountInfo) {
@@ -54,15 +61,18 @@ class AccountsServices {
       throw new InvalidLoginCredentials();
     }
 
-    const passwordsDidMatch = await bcrypt.compare(password, account.password);
+    const passwordsDidMatch = await AuthServices.comparePasswords(
+      password,
+      account.password,
+    );
     if (!passwordsDidMatch) {
       throw new InvalidLoginCredentials();
     }
 
-    const [accessToken, refreshToken] = await Promise.all([
-      AuthServices.generateAccountAccessToken(account._id),
-      AuthServices.generateAccountRefreshToken(account._id),
-    ]);
+    const {
+      accessToken,
+      refreshToken,
+    } = await AuthServices.generateAuthCredentials(account.id);
 
     account.auth.activeRefreshToken = refreshToken;
     await account.save();

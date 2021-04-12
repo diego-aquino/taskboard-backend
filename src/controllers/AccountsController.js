@@ -6,7 +6,6 @@ import {
   EmailAlreadyInUseError,
   InvalidLoginCredentials,
 } from '~/services/accounts/errors';
-import AuthServices from '~/services/auth';
 import { AccountsViews } from '~/views';
 
 class AccountsController {
@@ -15,14 +14,12 @@ class AccountsController {
       const { firstName, lastName, email, password } = request.body;
       const accountInfo = { firstName, lastName, email, password };
 
-      const createdAccount = await AccountsServices.create(accountInfo);
-      const accountId = createdAccount._id;
+      const {
+        account,
+        authCredentials: { accessToken, refreshToken },
+      } = await AccountsServices.create(accountInfo);
 
-      const accountView = AccountsViews.render(createdAccount.toObject());
-      const [accessToken, refreshToken] = await Promise.all([
-        AuthServices.generateAccountAccessToken(accountId),
-        AuthServices.generateAccountRefreshToken(accountId),
-      ]);
+      const accountView = AccountsViews.render(account.toObject());
 
       return response.status(201).json({
         account: accountView,

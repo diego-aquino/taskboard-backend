@@ -1,7 +1,18 @@
+import bcrypt from 'bcrypt';
+
 import config from '~/config';
 import { generateToken, verifyToken } from '~/utils/jwt';
 
 class AuthServices {
+  static async generateAuthCredentials(accountId) {
+    const [accessToken, refreshToken] = await Promise.all([
+      AuthServices.generateAccountAccessToken(accountId),
+      AuthServices.generateAccountRefreshToken(accountId),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+
   static generateAccountAccessToken(accountId) {
     const secretKey = config.jwt.accessSecretKey;
     const expiresIn = config.jwt.sessionExpiresIn;
@@ -11,6 +22,10 @@ class AuthServices {
   static generateAccountRefreshToken(accountId) {
     const secretKey = config.jwt.refreshSecretKey;
     return generateToken({ accountId }, secretKey);
+  }
+
+  static async comparePasswords(password, hashedPassword) {
+    return bcrypt.compare(password, hashedPassword);
   }
 
   static validateAuthHeader(authHeader) {
