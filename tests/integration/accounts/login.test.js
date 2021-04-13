@@ -16,14 +16,14 @@ describe('`/accounts/login` endpoint', () => {
   };
 
   beforeEach(async () => {
-    await Account.deleteMany({});
-    Object.assign(
-      account,
-      await registerAccount({
-        email: 'login.accounts@example.com',
-        password: account.password,
-      }),
-    );
+    const accountAlreadyExists = await Account.exists({ _id: account.id });
+    if (accountAlreadyExists) return;
+
+    const registeredAccount = await registerAccount({
+      email: 'login.accounts@example.com',
+      password: account.password,
+    });
+    Object.assign(account, registeredAccount);
   });
 
   it('should support logging in accounts', async () => {
@@ -38,20 +38,36 @@ describe('`/accounts/login` endpoint', () => {
       refreshToken: expect.any(String),
     });
 
-    const { refreshToken } = response.body;
-    const { refreshSecretKey } = config.jwt;
-    const { accountId } = await verifyToken(refreshToken, refreshSecretKey);
+    const { accessToken, refreshToken } = response.body;
 
-    expect(accountId).toBe(account.id);
-
-    const loggedInAccount = await Account.findOne({ email: account.email });
-    expect(loggedInAccount).toEqual(
-      expect.objectContaining({
-        auth: expect.objectContaining({
-          activeRefreshToken: refreshToken,
+    async function verifyLoggedInAccount() {
+      const loggedInAccount = await Account.findOne({ email: account.email });
+      expect(loggedInAccount).toEqual(
+        expect.objectContaining({
+          auth: expect.objectContaining({
+            activeRefreshToken: refreshToken,
+          }),
         }),
-      }),
-    );
+      );
+    }
+
+    async function verifyAuthCredentials() {
+      const { accessSecretKey, refreshSecretKey } = config.jwt;
+
+      const [accessPayload, refreshPayload] = await Promise.all([
+        verifyToken(accessToken, accessSecretKey),
+        verifyToken(refreshToken, refreshSecretKey),
+      ]);
+
+      expect(accessPayload).toEqual(
+        expect.objectContaining({ accountId: account.id }),
+      );
+      expect(refreshPayload).toEqual(
+        expect.objectContaining({ accountId: account.id }),
+      );
+    }
+
+    await Promise.all([verifyLoggedInAccount(), verifyAuthCredentials()]);
   });
 
   it('should not log in if email and password do not match', async () => {

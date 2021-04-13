@@ -18,7 +18,7 @@ describe('`/accounts/signup` endpoint', () => {
   };
 
   beforeEach(async () => {
-    await Account.deleteMany({});
+    await Account.findOneAndDelete({ email: fixture.email });
   });
 
   it('should support creating new accounts', async () => {
@@ -94,15 +94,17 @@ describe('`/accounts/signup` endpoint', () => {
   });
 
   it('should not create an account if email is not valid', async () => {
+    const invalidEmail = 'some-invalid-email';
+
     const response = await request(app)
       .post('/accounts/signup')
-      .send({ ...fixture, email: 'some-invalid-email' });
+      .send({ ...fixture, email: invalidEmail });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ message: 'Invalid email.' });
 
-    const accountsCreated = await Account.find({}).lean();
-    expect(accountsCreated.length).toBe(0);
+    const accountWasCreated = await Account.exists({ email: invalidEmail });
+    expect(accountWasCreated).toBe(false);
   });
 
   it('should not create an account if password is not 8-characters long', async () => {
@@ -115,8 +117,8 @@ describe('`/accounts/signup` endpoint', () => {
       message: 'Password too short.',
     });
 
-    const accountsCreated = await Account.find({}).lean();
-    expect(accountsCreated.length).toBe(0);
+    const accountWasCreated = await Account.exists({ email: fixture.email });
+    expect(accountWasCreated).toBe(false);
   });
 
   it('should not create an account if any required fields are empty or missing', async () => {
@@ -136,7 +138,9 @@ describe('`/accounts/signup` endpoint', () => {
       });
     });
 
-    const accountsCreated = await Account.find({}).lean();
-    expect(accountsCreated.length).toBe(0);
+    const accountsWereCreated = await Account.exists({
+      email: { $in: ['', undefined, null] },
+    });
+    expect(accountsWereCreated).toBe(false);
   });
 });

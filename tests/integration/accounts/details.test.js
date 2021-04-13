@@ -12,11 +12,13 @@ describe('`/accounts/details` endpoint', () => {
   const account = {};
 
   beforeEach(async () => {
-    await Account.deleteMany({});
-    Object.assign(
-      account,
-      await registerAccount({ email: 'details.accounts@example.com' }),
-    );
+    const accountAlreadyExists = await Account.exists({ _id: account.id });
+    if (accountAlreadyExists) return;
+
+    const registeredAccount = await registerAccount({
+      email: 'details.accounts@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   it('should return the details of an existing account', async () => {

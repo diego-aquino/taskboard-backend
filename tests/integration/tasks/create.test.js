@@ -9,15 +9,19 @@ beforeAll(database.connect);
 afterAll(database.disconnect);
 
 describe('`POST /tasks` endpoint', () => {
-  const fixture = {
-    name: 'My task',
-    priority: 'high',
-  };
+  const fixture = { name: 'My task', priority: 'high' };
   const account = {};
 
   beforeEach(async () => {
-    await Promise.all([Task.deleteMany({}), Account.deleteMany({})]);
-    Object.assign(account, await registerAccount());
+    await Task.deleteMany({ owner: account.id });
+
+    const accountAlreadyExists = await Account.exists({ _id: account.id });
+    if (accountAlreadyExists) return;
+
+    const registeredAccount = await registerAccount({
+      email: 'create.tasks@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   function createTaskRequest(accessToken) {

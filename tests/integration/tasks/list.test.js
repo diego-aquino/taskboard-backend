@@ -20,14 +20,14 @@ beforeAll(database.connect);
 afterAll(database.disconnect);
 
 describe('`GET /tasks` endpoint', () => {
-  const tasks = [];
   const account = {};
+  const tasks = [];
 
   beforeAll(async () => {
-    Object.assign(
-      account,
-      await registerAccount({ email: 'list.tasks@example.com' }),
-    );
+    const registeredAccount = await registerAccount({
+      email: 'list.tasks@example.com',
+    });
+    Object.assign(account, registeredAccount);
 
     const createdTasks = await Promise.all([
       registerTask(account, { name: '1st task', priority: 'high' }),

@@ -9,15 +9,17 @@ beforeAll(database.connect);
 afterAll(database.disconnect);
 
 describe('`GET /tasks/:taskId` endpoint', () => {
-  const task = {};
   const account = {};
+  const task = {};
 
   beforeAll(async () => {
-    Object.assign(
-      account,
-      await registerAccount({ email: 'get.tasks@example.com' }),
-    );
-    Object.assign(task, await registerTask(account));
+    const registeredAccount = await registerAccount({
+      email: 'get.tasks@example.com',
+    });
+    Object.assign(account, registeredAccount);
+
+    const registeredTask = await registerTask(account);
+    Object.assign(task, registeredTask);
   });
 
   function getTaskRequest(taskId, accessToken) {

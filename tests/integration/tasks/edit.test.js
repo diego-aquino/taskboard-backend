@@ -14,19 +14,21 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
     priority: 'low',
   };
 
-  const task = {};
   const account = {};
+  const task = {};
 
   beforeAll(async () => {
-    Object.assign(
-      account,
-      await registerAccount({ email: 'edit.tasks@example.com' }),
-    );
+    const registeredAccount = await registerAccount({
+      email: 'edit.tasks@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   beforeEach(async () => {
-    await Task.deleteMany({});
-    Object.assign(task, await registerTask(account));
+    await Task.deleteMany({ owner: account.id });
+
+    const registeredTask = await registerTask(account);
+    Object.assign(task, registeredTask);
   });
 
   function editTaskRequest(taskId, accessToken) {

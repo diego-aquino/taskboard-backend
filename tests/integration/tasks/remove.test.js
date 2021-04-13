@@ -9,19 +9,21 @@ beforeAll(database.connect);
 afterAll(database.disconnect);
 
 describe('`DELETE /tasks/:taskId` endpoint', () => {
-  const task = {};
   const account = {};
+  const task = {};
 
   beforeAll(async () => {
-    Object.assign(
-      account,
-      await registerAccount({ email: 'remove.tasks@example.com' }),
-    );
+    const registeredAccount = await registerAccount({
+      email: 'remove.tasks@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   beforeEach(async () => {
-    await Task.deleteMany({});
-    Object.assign(task, await registerTask(account));
+    await Task.deleteMany({ owner: account.id });
+
+    const registeredTask = await registerTask(account);
+    Object.assign(task, registeredTask);
   });
 
   function removeTaskRequest(taskId, accessToken) {

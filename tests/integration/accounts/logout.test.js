@@ -12,11 +12,13 @@ describe('`/accounts/logout` endpoint', () => {
   const account = {};
 
   beforeEach(async () => {
-    await Account.deleteMany({});
-    Object.assign(
-      account,
-      await registerAccount({ email: 'logout.accounts@example.com' }),
-    );
+    const accountAlreadyExists = await Account.exists({ _id: account.id });
+    if (accountAlreadyExists) return;
+
+    const registeredAccount = await registerAccount({
+      email: 'logout.accounts@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   function logoutAccountRequest(accessToken) {
