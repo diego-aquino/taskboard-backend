@@ -1,8 +1,10 @@
 import request from 'supertest';
 
 import app from '~/app';
+import config from '~/config';
 import database from '~/database';
 import { Account } from '~/models';
+import { verifyToken } from '~/utils/jwt';
 import { registerMockAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);
@@ -37,6 +39,10 @@ describe('`/accounts/login` endpoint', () => {
     });
 
     const { refreshToken } = response.body;
+    const { refreshSecretKey } = config.jwt;
+    const { accountId } = await verifyToken(refreshToken, refreshSecretKey);
+
+    expect(accountId).toBe(account.id);
 
     const loggedInAccount = await Account.findOne({ email: account.email });
     expect(loggedInAccount).toEqual(
