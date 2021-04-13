@@ -1,7 +1,9 @@
 import bcrypt from 'bcrypt';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 import config from '~/config';
 import { generateToken, verifyToken } from '~/utils/jwt';
+import { ExpiredTokenError, InvalidTokenError } from './errors';
 
 class AuthServices {
   static async generateAuthCredentials(accountId) {
@@ -44,7 +46,35 @@ class AuthServices {
 
   static async validateAccessToken(accessToken) {
     const secretKey = config.jwt.accessSecretKey;
-    return verifyToken(accessToken, secretKey);
+
+    try {
+      const payload = await verifyToken(accessToken, secretKey);
+      return payload;
+    } catch (error) {
+      return AuthServices.#handleTokenValidationError(error, 'access');
+    }
+  }
+
+  static async validateRefreshToken(refreshToken) {
+    const secretKey = config.jwt.refreshSecretKey;
+
+    try {
+      const payload = await verifyToken(refreshToken, secretKey);
+      return payload;
+    } catch (error) {
+      return AuthServices.#handleTokenValidationError(error, 'refresh');
+    }
+  }
+
+  static #handleTokenValidationError(error, tokenName) {
+    if (error instanceof TokenExpiredError) {
+      throw new ExpiredTokenError(tokenName);
+    }
+    if (error instanceof JsonWebTokenError) {
+      throw new InvalidTokenError(tokenName);
+    }
+
+    throw error;
   }
 }
 

@@ -1,3 +1,4 @@
+import { JsonWebTokenError } from 'jsonwebtoken';
 import { ValidationError } from 'yup';
 
 import AccountsServices from '~/services/accounts';
@@ -43,6 +44,20 @@ class AccountsController {
     }
   }
 
+  static async token(request, response, next) {
+    try {
+      const { refreshToken } = request.body;
+
+      const accessToken = await AccountsServices.generateNewAccessToken(
+        refreshToken,
+      );
+
+      return response.status(201).json({ accessToken });
+    } catch (error) {
+      return AccountsController.#handleError(error, { response, next });
+    }
+  }
+
   static async logout(request, response, next) {
     try {
       const { accountId } = request.locals;
@@ -83,7 +98,10 @@ class AccountsController {
       return response.status(404).json({ message });
     }
 
-    if (error instanceof InvalidLoginCredentials) {
+    if (
+      error instanceof InvalidLoginCredentials ||
+      error instanceof JsonWebTokenError
+    ) {
       return response.status(401).json({ message });
     }
 
