@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import app from '~/app';
 
-export async function registerMockAccount(accountInfo = {}) {
+export async function registerAccount(accountInfo = {}) {
   const {
     firstName = 'First',
     lastName = 'Last',
@@ -22,7 +22,7 @@ export async function registerMockAccount(accountInfo = {}) {
   return { ...account, accessToken, refreshToken };
 }
 
-export async function registerMockTask(account, taskInfo = {}) {
+export async function registerTask(account, taskInfo = {}) {
   const { name = 'My task', priority = 'high' } = taskInfo;
 
   const taskCreationResponse = await request(app)
@@ -33,4 +33,14 @@ export async function registerMockTask(account, taskInfo = {}) {
   const { task } = taskCreationResponse.body;
 
   return task;
+}
+
+export function withAuth(ongoingRequest) {
+  // eslint-disable-next-line no-param-reassign
+  ongoingRequest.auth = function addAuthorizationHeader(accessToken) {
+    this.set('Authorization', `Bearer ${accessToken}`);
+    return this;
+  };
+
+  return ongoingRequest;
 }

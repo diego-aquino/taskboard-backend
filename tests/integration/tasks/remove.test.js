@@ -4,39 +4,38 @@ import app from '~/app';
 import database from '~/database';
 import { Task } from '~/models';
 import {
-  registerMockAccount,
-  registerMockTask,
+  registerAccount,
+  registerTask,
+  withAuth,
 } from '~tests/utils/integration';
+
+function removeTask(taskId) {
+  return withAuth(request(app).delete(`/tasks/${taskId}`));
+}
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
 
 describe('`DELETE /tasks/:taskId` endpoint', () => {
-  const task = {};
   const account = {};
+  const task = {};
 
   beforeAll(async () => {
-    Object.assign(
-      account,
-      await registerMockAccount({ email: 'remove.tasks@example.com' }),
-    );
+    const registeredAccount = await registerAccount({
+      email: 'remove.tasks@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   beforeEach(async () => {
-    await Task.deleteMany({});
-    Object.assign(task, await registerMockTask(account));
+    await Task.deleteMany({ owner: account.id });
+
+    const registeredTask = await registerTask(account);
+    Object.assign(task, registeredTask);
   });
 
-  function removeTaskRequest(taskId, accessToken) {
-    const ongoingRequest = request(app).delete(`/tasks/${taskId}`);
-
-    return accessToken
-      ? ongoingRequest.set('Authorization', `Bearer ${accessToken}`)
-      : ongoingRequest;
-  }
-
   it('should support removing existing tasks', async () => {
-    const response = await removeTaskRequest(task.id, account.accessToken);
+    const response = await removeTask(task.id).auth(account.accessToken);
 
     expect(response.status).toBe(204);
 
@@ -47,25 +46,25 @@ describe('`DELETE /tasks/:taskId` endpoint', () => {
   it('should not remove a non-existing task', async () => {
     await Task.findByIdAndRemove(task.id);
 
-    const response = await removeTaskRequest(task.id, account.accessToken);
+    const response = await removeTask(task.id).auth(account.accessToken);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ message: 'Task not found.' });
   });
 
   it('should not remove a task owned by another account', async () => {
-    const otherAccount = await registerMockAccount({
+    const otherAccount = await registerAccount({
       email: 'other.remove.tasks@example.com',
     });
 
-    const response = await removeTaskRequest(task.id, otherAccount.accessToken);
+    const response = await removeTask(task.id).auth(otherAccount.accessToken);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ message: 'Task not found.' });
   });
 
   it('should not remove a task if the user is not authenticated', async () => {
-    const response = await removeTaskRequest();
+    const response = await removeTask();
 
     expect(response.status).toBe(401);
     expect(response.body).toEqual({

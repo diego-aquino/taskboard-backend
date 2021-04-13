@@ -5,7 +5,15 @@ import config from '~/config';
 import database from '~/database';
 import { Account } from '~/models';
 import { verifyToken } from '~/utils/jwt';
-import { registerMockAccount } from '~tests/utils/integration';
+import { registerAccount, withAuth } from '~tests/utils/integration';
+
+function token() {
+  return request(app).post('/accounts/token');
+}
+
+function logout() {
+  return withAuth(request(app).post('/accounts/logout'));
+}
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -14,17 +22,17 @@ describe('`/accounts/token` endpoint', () => {
   const account = {};
 
   beforeEach(async () => {
-    await Account.deleteMany({});
-    Object.assign(
-      account,
-      await registerMockAccount({ email: 'token.accounts@example.com' }),
-    );
+    const accountAlreadyExists = await Account.exists({ _id: account.id });
+    if (accountAlreadyExists) return;
+
+    const registeredAccount = await registerAccount({
+      email: 'token.accounts@example.com',
+    });
+    Object.assign(account, registeredAccount);
   });
 
   it('should support generating new access tokens to logged in accounts', async () => {
-    const response = await request(app).post('/accounts/token').send({
-      refreshToken: account.refreshToken,
-    });
+    const response = await token().send({ refreshToken: account.refreshToken });
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual({
@@ -41,9 +49,7 @@ describe('`/accounts/token` endpoint', () => {
   it('should not generate new access tokens to non-existing accounts', async () => {
     await Account.findByIdAndDelete(account.id);
 
-    const response = await request(app).post('/accounts/token').send({
-      refreshToken: account.refreshToken,
-    });
+    const response = await token().send({ refreshToken: account.refreshToken });
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({
@@ -52,12 +58,9 @@ describe('`/accounts/token` endpoint', () => {
   });
 
   it('should not generate new access tokens to accounts that are not logged in', async () => {
-    await request(app)
-      .post('/accounts/logout')
-      .set('Authorization', `Bearer ${account.accessToken}`)
-      .send();
+    await logout().auth(account.accessToken).send();
 
-    const response = await request(app).post('/accounts/token').send({
+    const response = await token().send({
       refreshToken: account.refreshToken,
     });
 
@@ -69,10 +72,8 @@ describe('`/accounts/token` endpoint', () => {
 
   it('should not generate new access tokens to if refresh token is missing or invalid', async () => {
     const errorResponses = await Promise.all([
-      request(app).post('/accounts/token').send({}),
-      request(app).post('/accounts/token').send({
-        refreshToken: 'this-is-not-a-refresh-token',
-      }),
+      token().send({}),
+      token().send({ refreshToken: 'this-is-not-a-refresh-token' }),
     ]);
 
     errorResponses.forEach((response) => {

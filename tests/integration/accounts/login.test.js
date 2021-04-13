@@ -5,7 +5,11 @@ import config from '~/config';
 import database from '~/database';
 import { Account } from '~/models';
 import { verifyToken } from '~/utils/jwt';
-import { registerMockAccount } from '~tests/utils/integration';
+import { registerAccount } from '~tests/utils/integration';
+
+export function login() {
+  return request(app).post('/accounts/login');
+}
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -16,18 +20,18 @@ describe('`/accounts/login` endpoint', () => {
   };
 
   beforeEach(async () => {
-    await Account.deleteMany({});
-    Object.assign(
-      account,
-      await registerMockAccount({
-        email: 'login.accounts@example.com',
-        password: account.password,
-      }),
-    );
+    const accountAlreadyExists = await Account.exists({ _id: account.id });
+    if (accountAlreadyExists) return;
+
+    const registeredAccount = await registerAccount({
+      email: 'login.accounts@example.com',
+      password: account.password,
+    });
+    Object.assign(account, registeredAccount);
   });
 
   it('should support logging in accounts', async () => {
-    const response = await request(app).post('/accounts/login').send({
+    const response = await login().send({
       email: account.email,
       password: account.password,
     });
@@ -38,24 +42,40 @@ describe('`/accounts/login` endpoint', () => {
       refreshToken: expect.any(String),
     });
 
-    const { refreshToken } = response.body;
-    const { refreshSecretKey } = config.jwt;
-    const { accountId } = await verifyToken(refreshToken, refreshSecretKey);
+    const { accessToken, refreshToken } = response.body;
 
-    expect(accountId).toBe(account.id);
-
-    const loggedInAccount = await Account.findOne({ email: account.email });
-    expect(loggedInAccount).toEqual(
-      expect.objectContaining({
-        auth: expect.objectContaining({
-          activeRefreshToken: refreshToken,
+    async function verifyLoggedInAccount() {
+      const loggedInAccount = await Account.findOne({ email: account.email });
+      expect(loggedInAccount).toEqual(
+        expect.objectContaining({
+          auth: expect.objectContaining({
+            activeRefreshToken: refreshToken,
+          }),
         }),
-      }),
-    );
+      );
+    }
+
+    async function verifyAuthCredentials() {
+      const { accessSecretKey, refreshSecretKey } = config.jwt;
+
+      const [accessPayload, refreshPayload] = await Promise.all([
+        verifyToken(accessToken, accessSecretKey),
+        verifyToken(refreshToken, refreshSecretKey),
+      ]);
+
+      expect(accessPayload).toEqual(
+        expect.objectContaining({ accountId: account.id }),
+      );
+      expect(refreshPayload).toEqual(
+        expect.objectContaining({ accountId: account.id }),
+      );
+    }
+
+    await Promise.all([verifyLoggedInAccount(), verifyAuthCredentials()]);
   });
 
   it('should not log in if email and password do not match', async () => {
-    const response = await request(app).post('/accounts/login').send({
+    const response = await login().send({
       email: account.email,
       password: 'some-different-password',
     });
@@ -68,8 +88,8 @@ describe('`/accounts/login` endpoint', () => {
 
   it('should not log in if any required fields are invalid or missing', async () => {
     const errorResponses = await Promise.all([
-      request(app).post('/accounts/login').send({ email: '', password: '' }),
-      request(app).post('/accounts/login').send({}),
+      login().send({ email: '', password: '' }),
+      login().send({}),
     ]);
 
     errorResponses.forEach((response) => {
@@ -83,7 +103,7 @@ describe('`/accounts/login` endpoint', () => {
   it('should not log in non-existing accounts', async () => {
     await Account.findByIdAndDelete(account.id);
 
-    const response = await request(app).post('/accounts/login').send({
+    const response = await login().send({
       email: account.email,
       password: account.password,
     });
