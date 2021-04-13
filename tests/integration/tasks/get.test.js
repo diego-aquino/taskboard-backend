@@ -3,10 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Task } from '~/models';
-import {
-  registerMockAccount,
-  registerMockTask,
-} from '~tests/utils/integration';
+import { registerAccount, registerTask } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -18,9 +15,9 @@ describe('`GET /tasks/:taskId` endpoint', () => {
   beforeAll(async () => {
     Object.assign(
       account,
-      await registerMockAccount({ email: 'get.tasks@example.com' }),
+      await registerAccount({ email: 'get.tasks@example.com' }),
     );
-    Object.assign(task, await registerMockTask(account));
+    Object.assign(task, await registerTask(account));
   });
 
   function getTaskRequest(taskId, accessToken) {
@@ -57,7 +54,7 @@ describe('`GET /tasks/:taskId` endpoint', () => {
   });
 
   it('should not return details of a task related to another account', async () => {
-    const otherAccount = await registerMockAccount({
+    const otherAccount = await registerAccount({
       email: 'other.get.tasks@example.com',
     });
 

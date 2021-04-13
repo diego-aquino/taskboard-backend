@@ -5,7 +5,7 @@ import config from '~/config';
 import database from '~/database';
 import { Account } from '~/models';
 import { verifyToken } from '~/utils/jwt';
-import { registerMockAccount } from '~tests/utils/integration';
+import { registerAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -19,7 +19,7 @@ describe('`/accounts/login` endpoint', () => {
     await Account.deleteMany({});
     Object.assign(
       account,
-      await registerMockAccount({
+      await registerAccount({
         email: 'login.accounts@example.com',
         password: account.password,
       }),

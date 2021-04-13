@@ -3,10 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Task } from '~/models';
-import {
-  registerMockAccount,
-  registerMockTask,
-} from '~tests/utils/integration';
+import { registerAccount, registerTask } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -23,13 +20,13 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   beforeAll(async () => {
     Object.assign(
       account,
-      await registerMockAccount({ email: 'edit.tasks@example.com' }),
+      await registerAccount({ email: 'edit.tasks@example.com' }),
     );
   });
 
   beforeEach(async () => {
     await Task.deleteMany({});
-    Object.assign(task, await registerMockTask(account));
+    Object.assign(task, await registerTask(account));
   });
 
   function editTaskRequest(taskId, accessToken) {
@@ -100,7 +97,7 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   });
 
   it('should not edit a task owned by another account', async () => {
-    const otherAccount = await registerMockAccount({
+    const otherAccount = await registerAccount({
       email: 'other.edit.tasks@example.com',
     });
 

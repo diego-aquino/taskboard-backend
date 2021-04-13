@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Account, Task } from '~/models';
-import { registerMockAccount } from '~tests/utils/integration';
+import { registerAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -17,7 +17,7 @@ describe('`POST /tasks` endpoint', () => {
 
   beforeEach(async () => {
     await Promise.all([Task.deleteMany({}), Account.deleteMany({})]);
-    Object.assign(account, await registerMockAccount());
+    Object.assign(account, await registerAccount());
   });
 
   function createTaskRequest(accessToken) {

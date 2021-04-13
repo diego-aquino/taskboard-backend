@@ -3,10 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Task } from '~/models';
-import {
-  registerMockAccount,
-  registerMockTask,
-} from '~tests/utils/integration';
+import { registerAccount, registerTask } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -18,13 +15,13 @@ describe('`DELETE /tasks/:taskId` endpoint', () => {
   beforeAll(async () => {
     Object.assign(
       account,
-      await registerMockAccount({ email: 'remove.tasks@example.com' }),
+      await registerAccount({ email: 'remove.tasks@example.com' }),
     );
   });
 
   beforeEach(async () => {
     await Task.deleteMany({});
-    Object.assign(task, await registerMockTask(account));
+    Object.assign(task, await registerTask(account));
   });
 
   function removeTaskRequest(taskId, accessToken) {
@@ -54,7 +51,7 @@ describe('`DELETE /tasks/:taskId` endpoint', () => {
   });
 
   it('should not remove a task owned by another account', async () => {
-    const otherAccount = await registerMockAccount({
+    const otherAccount = await registerAccount({
       email: 'other.remove.tasks@example.com',
     });
 

@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Account } from '~/models';
-import { registerMockAccount } from '~tests/utils/integration';
+import { registerAccount } from '~tests/utils/integration';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -15,7 +15,7 @@ describe('`/accounts/details` endpoint', () => {
     await Account.deleteMany({});
     Object.assign(
       account,
-      await registerMockAccount({ email: 'details.accounts@example.com' }),
+      await registerAccount({ email: 'details.accounts@example.com' }),
     );
   });
 
