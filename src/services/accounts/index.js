@@ -2,6 +2,7 @@ import * as yup from 'yup';
 
 import { Account } from '~/models';
 import AuthServices from '~/services/auth';
+import { InvalidTokenError } from '~/services/auth/errors';
 import {
   AccountNotFoundError,
   EmailAlreadyInUseError,
@@ -26,10 +27,10 @@ class AccountsServices {
       password,
     });
 
-    const {
-      accessToken,
-      refreshToken,
-    } = await AuthServices.generateAuthCredentials(account.id);
+    const { accessToken, refreshToken } = await AccountsServices.login({
+      email,
+      password,
+    });
 
     return {
       account,
@@ -93,6 +94,28 @@ class AccountsServices {
     return loginCredentialsSchema.validate(credentials);
   }
 
+  static async generateNewAccessToken(refreshToken) {
+    const { accountId } = await AuthServices.validateRefreshToken(refreshToken);
+
+    const account = await AccountsServices.findById(accountId)
+      .select('+auth')
+      .lean();
+
+    if (!account) {
+      throw new AccountNotFoundError();
+    }
+
+    if (account.auth.activeRefreshToken !== refreshToken) {
+      throw new InvalidTokenError('refresh');
+    }
+
+    const newAccessToken = await AuthServices.generateAccountAccessToken(
+      accountId,
+    );
+
+    return newAccessToken;
+  }
+
   static async logout(accountId) {
     const account = await Account.findById(accountId);
 
@@ -100,7 +123,7 @@ class AccountsServices {
       throw new AccountNotFoundError();
     }
 
-    account.auth.refreshToken = null;
+    account.auth.activeRefreshToken = null;
     await account.save();
   }
 

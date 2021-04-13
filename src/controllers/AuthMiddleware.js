@@ -1,4 +1,4 @@
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import { JsonWebTokenError } from 'jsonwebtoken';
 import AuthServices from '~/services/auth';
 
 class AuthMiddleware {
@@ -15,14 +15,10 @@ class AuthMiddleware {
   }
 
   static #handleError(error, { response, next }) {
-    if (error instanceof TokenExpiredError) {
-      return response.status(401).json({ message: 'Expired access token.' });
-    }
+    const { message } = error;
 
     if (error instanceof JsonWebTokenError) {
-      return response.status(401).json({
-        message: 'Invalid or missing access token.',
-      });
+      return response.status(401).json({ message });
     }
 
     return next(error);
