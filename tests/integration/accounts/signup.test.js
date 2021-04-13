@@ -1,8 +1,10 @@
 import request from 'supertest';
 
 import app from '~/app';
+import config from '~/config';
 import database from '~/database';
 import { Account } from '~/models';
+import { verifyToken } from '~/utils/jwt';
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -15,7 +17,9 @@ describe('`/accounts/signup` endpoint', () => {
     password: '12345678',
   };
 
-  beforeEach(() => Account.deleteMany({}));
+  beforeEach(async () => {
+    await Account.deleteMany({});
+  });
 
   it('should support creating new accounts', async () => {
     const response = await request(app).post('/accounts/signup').send(fixture);
@@ -33,19 +37,37 @@ describe('`/accounts/signup` endpoint', () => {
     });
 
     const accountId = response.body.account.id;
-    const createdAccount = await Account.findOne({ email: fixture.email })
-      .select('+password')
-      .lean();
 
-    expect(createdAccount._id.toString()).toBe(accountId);
-    expect(createdAccount).toEqual(
-      expect.objectContaining({
-        firstName: fixture.firstName,
-        lastName: fixture.lastName,
-        email: fixture.email,
-        password: expect.any(String),
-      }),
-    );
+    async function verifyStoredAccount() {
+      const createdAccount = await Account.findOne({ email: fixture.email })
+        .select('+password')
+        .lean();
+
+      expect(createdAccount._id.toString()).toBe(accountId);
+      expect(createdAccount).toEqual(
+        expect.objectContaining({
+          firstName: fixture.firstName,
+          lastName: fixture.lastName,
+          email: fixture.email,
+          password: expect.any(String),
+        }),
+      );
+    }
+
+    async function verifyAuthCredentials() {
+      const { accessToken, refreshToken } = response.body;
+      const { accessSecretKey, refreshSecretKey } = config.jwt;
+
+      const [accessPayload, refreshPayload] = await Promise.all([
+        verifyToken(accessToken, accessSecretKey),
+        verifyToken(refreshToken, refreshSecretKey),
+      ]);
+
+      expect(accessPayload).toEqual(expect.objectContaining({ accountId }));
+      expect(refreshPayload).toEqual(expect.objectContaining({ accountId }));
+    }
+
+    await Promise.all([verifyStoredAccount(), verifyAuthCredentials()]);
   });
 
   it('should not create an account if email already exists', async () => {
