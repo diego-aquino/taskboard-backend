@@ -18,7 +18,8 @@
       "alias": {
         "map": [
           ["~", "./src"],
-          ["~tests", "./tests"]
+          ["~tests", "./tests"],
+          ["~docs", "./docs"]
         ],
         "extensions": [".js", ".json"]
       }
