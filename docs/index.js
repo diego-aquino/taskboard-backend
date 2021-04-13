@@ -1,3 +1,9 @@
+import {
+  globalComponents,
+  accountsComponents,
+  securityComponents,
+} from './components';
+import { accountsPaths } from './paths';
 import servers from './servers';
 
 const docs = {
@@ -17,6 +23,22 @@ const docs = {
     },
   },
   servers,
+  tags: [{ name: 'Contas e autenticação' }, { name: 'Tarefas' }],
+  components: {
+    schemas: {
+      ...globalComponents.schemas,
+      ...accountsComponents.schemas,
+    },
+    examples: {
+      ...accountsComponents.examples,
+    },
+    securitySchemes: {
+      ...securityComponents.schemes,
+    },
+  },
+  paths: {
+    ...accountsPaths,
+  },
 };
 
 export default docs;
