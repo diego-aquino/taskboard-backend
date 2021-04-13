@@ -9,6 +9,10 @@ import { verifyToken } from '~/utils/jwt';
 beforeAll(database.connect);
 afterAll(database.disconnect);
 
+function signup() {
+  return request(app).post('/accounts/signup');
+}
+
 describe('`/accounts/signup` endpoint', () => {
   const fixture = {
     firstName: 'First',
@@ -22,7 +26,7 @@ describe('`/accounts/signup` endpoint', () => {
   });
 
   it('should support creating new accounts', async () => {
-    const response = await request(app).post('/accounts/signup').send(fixture);
+    const response = await signup().send(fixture);
 
     expect(response.status).toBe(201);
     expect(response.body).toEqual({
@@ -71,17 +75,15 @@ describe('`/accounts/signup` endpoint', () => {
   });
 
   it('should not create an account if email already exists', async () => {
-    const response = await request(app).post('/accounts/signup').send(fixture);
+    const response = await signup().send(fixture);
     expect(response.status).toBe(201);
 
-    const emailAlreadyInUseResponse = await request(app)
-      .post('/accounts/signup')
-      .send({
-        ...fixture,
-        firstName: 'OtherFirst',
-        lastName: 'OtherLast',
-        password: '87654321',
-      });
+    const emailAlreadyInUseResponse = await signup().send({
+      ...fixture,
+      firstName: 'OtherFirst',
+      lastName: 'OtherLast',
+      password: '87654321',
+    });
     expect(emailAlreadyInUseResponse.status).toBe(409);
     expect(emailAlreadyInUseResponse.body).toEqual({
       message: 'Email is already in use.',
@@ -96,9 +98,7 @@ describe('`/accounts/signup` endpoint', () => {
   it('should not create an account if email is not valid', async () => {
     const invalidEmail = 'some-invalid-email';
 
-    const response = await request(app)
-      .post('/accounts/signup')
-      .send({ ...fixture, email: invalidEmail });
+    const response = await signup().send({ ...fixture, email: invalidEmail });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ message: 'Invalid email.' });
@@ -108,9 +108,10 @@ describe('`/accounts/signup` endpoint', () => {
   });
 
   it('should not create an account if password is not 8-characters long', async () => {
-    const passwordTooShortResponse = await request(app)
-      .post('/accounts/signup')
-      .send({ ...fixture, password: '1234567' });
+    const passwordTooShortResponse = await signup().send({
+      ...fixture,
+      password: '1234567',
+    });
 
     expect(passwordTooShortResponse.status).toBe(400);
     expect(passwordTooShortResponse.body).toEqual({
@@ -123,12 +124,8 @@ describe('`/accounts/signup` endpoint', () => {
 
   it('should not create an account if any required fields are empty or missing', async () => {
     const errorResponses = await Promise.all([
-      request(app).post('/accounts/signup').send({
-        firstName: '',
-        lastName: '',
-        email: '',
-      }),
-      request(app).post('/accounts/signup').send({}),
+      signup().send({ firstName: '', lastName: '', email: '' }),
+      signup().send({}),
     ]);
 
     errorResponses.forEach((response) => {

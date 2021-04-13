@@ -7,6 +7,10 @@ import { Account } from '~/models';
 import { verifyToken } from '~/utils/jwt';
 import { registerAccount } from '~tests/utils/integration';
 
+export function login() {
+  return request(app).post('/accounts/login');
+}
+
 beforeAll(database.connect);
 afterAll(database.disconnect);
 
@@ -27,7 +31,7 @@ describe('`/accounts/login` endpoint', () => {
   });
 
   it('should support logging in accounts', async () => {
-    const response = await request(app).post('/accounts/login').send({
+    const response = await login().send({
       email: account.email,
       password: account.password,
     });
@@ -71,7 +75,7 @@ describe('`/accounts/login` endpoint', () => {
   });
 
   it('should not log in if email and password do not match', async () => {
-    const response = await request(app).post('/accounts/login').send({
+    const response = await login().send({
       email: account.email,
       password: 'some-different-password',
     });
@@ -84,8 +88,8 @@ describe('`/accounts/login` endpoint', () => {
 
   it('should not log in if any required fields are invalid or missing', async () => {
     const errorResponses = await Promise.all([
-      request(app).post('/accounts/login').send({ email: '', password: '' }),
-      request(app).post('/accounts/login').send({}),
+      login().send({ email: '', password: '' }),
+      login().send({}),
     ]);
 
     errorResponses.forEach((response) => {
@@ -99,7 +103,7 @@ describe('`/accounts/login` endpoint', () => {
   it('should not log in non-existing accounts', async () => {
     await Account.findByIdAndDelete(account.id);
 
-    const response = await request(app).post('/accounts/login').send({
+    const response = await login().send({
       email: account.email,
       password: account.password,
     });

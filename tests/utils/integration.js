@@ -34,3 +34,13 @@ export async function registerTask(account, taskInfo = {}) {
 
   return task;
 }
+
+export function withAuth(ongoingRequest) {
+  // eslint-disable-next-line no-param-reassign
+  ongoingRequest.auth = function addAuthorizationHeader(accessToken) {
+    this.set('Authorization', `Bearer ${accessToken}`);
+    return this;
+  };
+
+  return ongoingRequest;
+}

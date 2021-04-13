@@ -3,7 +3,15 @@ import request from 'supertest';
 import app from '~/app';
 import database from '~/database';
 import { Task } from '~/models';
-import { registerAccount, registerTask } from '~tests/utils/integration';
+import {
+  registerAccount,
+  registerTask,
+  withAuth,
+} from '~tests/utils/integration';
+
+function editTask(taskId) {
+  return withAuth(request(app).put(`/tasks/${taskId}`));
+}
 
 beforeAll(database.connect);
 afterAll(database.disconnect);
@@ -31,18 +39,10 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
     Object.assign(task, registeredTask);
   });
 
-  function editTaskRequest(taskId, accessToken) {
-    const ongoingRequest = request(app).put(`/tasks/${taskId}`);
-
-    return accessToken
-      ? ongoingRequest.set('Authorization', `Bearer ${accessToken}`)
-      : ongoingRequest;
-  }
-
   it('should support editing an existing task', async () => {
-    const response = await editTaskRequest(task.id, account.accessToken).send(
-      editFixture,
-    );
+    const response = await editTask(task.id)
+      .auth(account.accessToken)
+      .send(editFixture);
 
     expect(response.status).toBe(204);
 
@@ -56,7 +56,7 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   });
 
   it('should support editing the name of a task without affecting other fields', async () => {
-    const response = await editTaskRequest(task.id, account.accessToken).send({
+    const response = await editTask(task.id).auth(account.accessToken).send({
       name: editFixture.name,
     });
 
@@ -72,7 +72,7 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   });
 
   it('should support editing the priority of a task without affecting other fields', async () => {
-    const response = await editTaskRequest(task.id, account.accessToken).send({
+    const response = await editTask(task.id).auth(account.accessToken).send({
       priority: editFixture.priority,
     });
 
@@ -90,9 +90,9 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   it('should not edit a non-existing task', async () => {
     await Task.findByIdAndRemove(task.id);
 
-    const response = await editTaskRequest(task.id, account.accessToken).send(
-      editFixture,
-    );
+    const response = await editTask(task.id)
+      .auth(account.accessToken)
+      .send(editFixture);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ message: 'Task not found.' });
@@ -103,10 +103,9 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
       email: 'other.edit.tasks@example.com',
     });
 
-    const response = await editTaskRequest(
-      task.id,
-      otherAccount.accessToken,
-    ).send(editFixture);
+    const response = await editTask(task.id)
+      .auth(otherAccount.accessToken)
+      .send(editFixture);
 
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ message: 'Task not found.' });
@@ -114,8 +113,8 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
 
   it('should not edit a task if any fields are empty', async () => {
     const errorResponses = await Promise.all([
-      editTaskRequest(task.id, account.accessToken).send({ name: '' }),
-      editTaskRequest(task.id, account.accessToken).send({ priority: '' }),
+      editTask(task.id).auth(account.accessToken).send({ name: '' }),
+      editTask(task.id).auth(account.accessToken).send({ priority: '' }),
     ]);
 
     errorResponses.forEach((response) => {
@@ -131,17 +130,19 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   });
 
   it('should not edit a task if priority is unknown', async () => {
-    const response = await editTaskRequest(task.id, account.accessToken).send({
-      ...editFixture,
-      priority: 'some-unknown-priority',
-    });
+    const response = await editTask(task.id)
+      .auth(account.accessToken)
+      .send({
+        ...editFixture,
+        priority: 'some-unknown-priority',
+      });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ message: 'Unknown priority.' });
   });
 
   it('should not edit a task if the user is not authenticated', async () => {
-    const response = await editTaskRequest(task.id).send(editFixture);
+    const response = await editTask(task.id).send(editFixture);
 
     expect(response.status).toBe(401);
     expect(response.body).toEqual({

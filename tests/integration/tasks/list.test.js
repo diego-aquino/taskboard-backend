@@ -2,7 +2,11 @@ import request from 'supertest';
 
 import app from '~/app';
 import database from '~/database';
-import { registerAccount, registerTask } from '~tests/utils/integration';
+import {
+  registerAccount,
+  registerTask,
+  withAuth,
+} from '~tests/utils/integration';
 
 function tasksSortedByPriority(tasks, { ascending = true }) {
   const sortingFactor = ascending ? 1 : -1;
@@ -14,6 +18,10 @@ function tasksSortedByPriority(tasks, { ascending = true }) {
   return tasks.sort(
     (task, taskToCompare) => comparedTo[task.priority][taskToCompare.priority],
   );
+}
+
+function listTasks() {
+  return withAuth(request(app).get(`/tasks`));
 }
 
 beforeAll(database.connect);
@@ -39,16 +47,8 @@ describe('`GET /tasks` endpoint', () => {
     createdTasks.forEach((task) => tasks.push(task));
   });
 
-  function listTasksRequest(accessToken) {
-    const ongoingRequest = request(app).get(`/tasks`);
-
-    return accessToken
-      ? ongoingRequest.set('Authorization', `Bearer ${accessToken}`)
-      : ongoingRequest;
-  }
-
   it('should list all tasks related to an account', async () => {
-    const response = await listTasksRequest(account.accessToken);
+    const response = await listTasks().auth(account.accessToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -58,8 +58,8 @@ describe('`GET /tasks` endpoint', () => {
 
   it('should support listing tasks ordered by priority', async () => {
     const orderedResponses = await Promise.all([
-      listTasksRequest(account.accessToken).query({ sortByPriority: 'asc' }),
-      listTasksRequest(account.accessToken).query({ sortByPriority: 'desc' }),
+      listTasks().auth(account.accessToken).query({ sortByPriority: 'asc' }),
+      listTasks().auth(account.accessToken).query({ sortByPriority: 'desc' }),
     ]);
 
     orderedResponses.forEach((response) => {
@@ -77,7 +77,7 @@ describe('`GET /tasks` endpoint', () => {
   });
 
   it('should not list tasks if the sorting order is invalid', async () => {
-    const response = await listTasksRequest(account.accessToken).query({
+    const response = await listTasks().auth(account.accessToken).query({
       sortByPriority: 'not-a-valid-order',
     });
 
@@ -90,14 +90,14 @@ describe('`GET /tasks` endpoint', () => {
       email: 'other.list.tasks@example.com',
     });
 
-    const response = await listTasksRequest(otherAccount.accessToken);
+    const response = await listTasks().auth(otherAccount.accessToken);
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({ tasks: [] });
   });
 
   it('should not list tasks if the user is not authenticated', async () => {
-    const response = await listTasksRequest();
+    const response = await listTasks();
 
     expect(response.status).toBe(401);
     expect(response.body).toEqual({
