@@ -9,12 +9,6 @@ const accountsPaths = {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/signup/accountInfo' },
-            example: {
-              firstName: 'Diego',
-              lastName: 'Aquino',
-              email: 'diegoaquino@example.com',
-              password: 'O1@2Ff)wo@$na6490',
-            },
           },
         },
       },
@@ -24,16 +18,6 @@ const accountsPaths = {
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/signup/successResponse' },
-              example: {
-                account: {
-                  id: '6075c1b4b649d40015af4f62',
-                  firstName: 'Diego',
-                  lastName: 'Aquino',
-                  email: 'diegoaquino@example.com',
-                },
-                accessToken: '937f0d5cbba322c5bd8025663b72b11e',
-                refreshToken: '429ee8e85dc2a805bf47656cf8bfe108',
-              },
             },
           },
         },
@@ -41,10 +25,7 @@ const accountsPaths = {
           description: 'Bad request - Erro de validação',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Invalid or missing required field(s).',
-              },
+              schema: { $ref: '#/components/schemas/errors/validationError' },
             },
           },
         },
@@ -52,10 +33,7 @@ const accountsPaths = {
           description: 'Conflict - Email já está em uso',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Email is already in use.',
-              },
+              schema: { $ref: '#/components/schemas/errors/emailAlreadyInUse' },
             },
           },
         },
@@ -74,14 +52,6 @@ const accountsPaths = {
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/details/successResponse' },
-              example: {
-                account: {
-                  id: '6075c1b4b649d40015af4f62',
-                  firstName: 'Diego',
-                  lastName: 'Aquino',
-                  email: 'diegoaquino@example.com',
-                },
-              },
             },
           },
         },
@@ -90,9 +60,8 @@ const accountsPaths = {
             'Unauthorized - Token de acesso inválido ou não fornecido',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Invalid or missing access token.',
+              schema: {
+                $ref: '#/components/schemas/errors/invalidAccessToken',
               },
             },
           },
@@ -101,10 +70,7 @@ const accountsPaths = {
           description: 'Not found - Conta não encontrada',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Account not found.',
-              },
+              schema: { $ref: '#/components/schemas/errors/accountNotFound' },
             },
           },
         },
@@ -122,10 +88,6 @@ const accountsPaths = {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/login/credentials' },
-            example: {
-              email: 'diegoaquino@example.com',
-              password: 'O1@2Ff)wo@$na6490',
-            },
           },
         },
       },
@@ -135,10 +97,6 @@ const accountsPaths = {
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/login/successResponse' },
-              example: {
-                accessToken: '937f0d5cbba322c5bd8025663b72b11e',
-                refreshToken: '429ee8e85dc2a805bf47656cf8bfe108',
-              },
             },
           },
         },
@@ -146,10 +104,7 @@ const accountsPaths = {
           description: 'Bad request - Erro de validação',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Invalid or missing required field(s).',
-              },
+              schema: { $ref: '#/components/schemas/errors/validationError' },
             },
           },
         },
@@ -157,9 +112,8 @@ const accountsPaths = {
           description: 'Unauthorized - Email e/ou senha não conferem',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Email and/or password do not match.',
+              schema: {
+                $ref: '#/components/schemas/errors/invalidLoginCredentials',
               },
             },
           },
@@ -178,9 +132,6 @@ const accountsPaths = {
         content: {
           'application/json': {
             schema: { $ref: '#/components/schemas/token/credentials' },
-            example: {
-              refreshToken: '429ee8e85dc2a805bf47656cf8bfe108',
-            },
           },
         },
       },
@@ -190,9 +141,6 @@ const accountsPaths = {
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/token/successResponse' },
-              example: {
-                accessToken: '937f0d5cbba322c5bd8025663b72b11e',
-              },
             },
           },
         },
@@ -201,9 +149,8 @@ const accountsPaths = {
             'Unauthorized - Token de refresh inválido ou não fornecido',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Invalid or missing refresh token.',
+              schema: {
+                $ref: '#/components/schemas/errors/invalidRefreshToken',
               },
             },
           },
@@ -212,10 +159,7 @@ const accountsPaths = {
           description: 'Not found - Conta não encontrada',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Account not found.',
-              },
+              schema: { $ref: '#/components/schemas/errors/accountNotFound' },
             },
           },
         },
@@ -230,16 +174,15 @@ const accountsPaths = {
       security: [{ bearerAuth: [] }],
       responses: {
         204: {
-          description: 'OK - Log out realizado com sucesso',
+          description: 'OK - Logout realizado com sucesso',
         },
         401: {
           description:
             'Unauthorized - Token de acesso inválido ou não fornecido',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Invalid or missing access token.',
+              schema: {
+                $ref: '#/components/schemas/errors/invalidAccessToken',
               },
             },
           },
@@ -248,10 +191,7 @@ const accountsPaths = {
           description: 'Not found - Conta não encontrada',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/global/error' },
-              example: {
-                message: 'Account not found.',
-              },
+              schema: { $ref: '#/components/schemas/errors/accountNotFound' },
             },
           },
         },

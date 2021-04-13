@@ -1,7 +1,7 @@
 import {
-  globalComponents,
   accountsComponents,
   securityComponents,
+  errorComponents,
 } from './components';
 import { accountsPaths } from './paths';
 import servers from './servers';
@@ -26,11 +26,8 @@ const docs = {
   tags: [{ name: 'Contas e autenticação' }, { name: 'Tarefas' }],
   components: {
     schemas: {
-      ...globalComponents.schemas,
+      ...errorComponents.schemas,
       ...accountsComponents.schemas,
-    },
-    examples: {
-      ...accountsComponents.examples,
     },
     securitySchemes: {
       ...securityComponents.schemes,

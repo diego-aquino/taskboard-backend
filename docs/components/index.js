@@ -1,17 +1,5 @@
 import accountsComponents from './accountsComponents';
 import securityComponents from './securityComponents';
+import errorComponents from './errorComponents';
 
-const globalSchemas = {
-  global: {
-    error: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-    },
-  },
-};
-
-const globalComponents = { schemas: globalSchemas };
-
-export { globalComponents, accountsComponents, securityComponents };
+export { accountsComponents, securityComponents, errorComponents };
