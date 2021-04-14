@@ -2,7 +2,7 @@ import { Router } from 'express';
 import swagger from 'swagger-ui-express';
 
 import config from '~/config';
-import docs from '~docs';
+import docs from '~/docs';
 
 const docsRoutes = Router();
 
