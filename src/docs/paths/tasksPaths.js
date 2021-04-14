@@ -58,7 +58,7 @@ const tasksPaths = {
 
     get: {
       tags: ['Tarefas'],
-      description: 'Listar todas as tarefas associadas a uma conta',
+      description: 'Listar as tarefas associadas a uma conta',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -69,10 +69,15 @@ const tasksPaths = {
           description:
             "'asc' para ascendente (low - high)<br>'desc' para descendente (high - low)",
         },
+        {
+          name: 'page',
+          type: 'number',
+          in: 'query',
+        },
       ],
       responses: {
         200: {
-          description: 'OK - Informações da tarefa retornadas',
+          description: 'OK - Tarefas retornadas',
           content: {
             'application/json': {
               schema: {
@@ -82,12 +87,11 @@ const tasksPaths = {
           },
         },
         400: {
-          description: 'Bad request - Critério de ordenação desconhecido',
+          description: 'Bad request - Erro da validação',
           content: {
             'application/json': {
               schema: {
-                $ref:
-                  '#/components/schemas/errors/validation/invalidTaskSortingOrder',
+                $ref: '#/components/schemas/errors/validation/invalidFields',
               },
             },
           },
