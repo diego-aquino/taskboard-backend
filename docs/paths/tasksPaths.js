@@ -29,7 +29,7 @@ const tasksPaths = {
             'application/json': {
               schema: {
                 $ref:
-                  '#/components/schemas/errors/validationErrorInvalidOrRequiredFields',
+                  '#/components/schemas/errors/validation/invalidOrRequiredFields',
               },
             },
           },
@@ -58,7 +58,7 @@ const tasksPaths = {
 
     get: {
       tags: ['Tarefas'],
-      description: 'Listar todas as tarefas associadas',
+      description: 'Listar todas as tarefas associadas a uma conta',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -82,12 +82,12 @@ const tasksPaths = {
           },
         },
         400: {
-          description: 'Bad request - Erro de validação',
+          description: 'Bad request - Critério de ordenação desconhecido',
           content: {
             'application/json': {
               schema: {
                 $ref:
-                  '#/components/schemas/errors/validationErrorInvalidOrRequiredFields',
+                  '#/components/schemas/errors/validation/invalidTaskSortingOrder',
               },
             },
           },
@@ -195,8 +195,7 @@ const tasksPaths = {
           content: {
             'application/json': {
               schema: {
-                $ref:
-                  '#/components/schemas/errors/validationErrorInvalidFields',
+                $ref: '#/components/schemas/errors/validation/invalidFields',
               },
             },
           },

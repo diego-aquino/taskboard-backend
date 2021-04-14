@@ -1,21 +1,33 @@
 const schemas = {
-  validationErrorInvalidOrRequiredFields: {
-    type: 'object',
-    properties: {
-      message: { type: 'string' },
+  validation: {
+    invalidOrRequiredFields: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+      example: {
+        message: 'Invalid or missing required field(s).',
+      },
     },
-    example: {
-      message: 'Invalid or missing required field(s).',
-    },
-  },
 
-  validationErrorInvalidFields: {
-    type: 'object',
-    properties: {
-      message: { type: 'string' },
+    invalidFields: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+      example: {
+        message: 'Invalid field(s).',
+      },
     },
-    example: {
-      message: 'Invalid field(s).',
+
+    invalidTaskSortingOrder: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+      example: {
+        message: 'Invalid sorting order.',
+      },
     },
   },
 

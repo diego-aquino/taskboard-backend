@@ -31,7 +31,7 @@ const accountsPaths = {
             'application/json': {
               schema: {
                 $ref:
-                  '#/components/schemas/errors/validationErrorInvalidOrRequiredFields',
+                  '#/components/schemas/errors/validation/invalidOrRequiredFields',
               },
             },
           },
@@ -102,7 +102,7 @@ const accountsPaths = {
       },
       responses: {
         200: {
-          description: 'OK - Credenciais de autenticação retornadas',
+          description: 'OK - Credenciais de autenticação criadas',
           content: {
             'application/json': {
               schema: {
@@ -117,13 +117,14 @@ const accountsPaths = {
             'application/json': {
               schema: {
                 $ref:
-                  '#/components/schemas/errors/validationErrorInvalidOrRequiredFields',
+                  '#/components/schemas/errors/validation/invalidOrRequiredFields',
               },
             },
           },
         },
         401: {
-          description: 'Unauthorized - Email e/ou senha não conferem',
+          description:
+            'Unauthorized - Email e/ou senha não conferem ou não existem',
           content: {
             'application/json': {
               schema: {
@@ -151,7 +152,7 @@ const accountsPaths = {
       },
       responses: {
         200: {
-          description: 'OK - Novo token de acesso retornado',
+          description: 'OK - Novo token de acesso criado',
           content: {
             'application/json': {
               schema: {

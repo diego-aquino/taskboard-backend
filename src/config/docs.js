@@ -19,11 +19,14 @@ const docsConfig = {
       min-width: 5em;
     }
 
+    .opblock-section > div.opblock-section.opblock-section-request-body pre,
     .responses-wrapper > .responses-inner td.response-col_description pre {
       min-height: 0;
       padding: 1rem !important;
     }
 
+    .opblock-section > div.opblock-section.opblock-section-request-body pre
+      code,
     .responses-wrapper > .responses-inner td.response-col_description pre
       code {
       font-family: 'JetBrains Mono', monospace;
