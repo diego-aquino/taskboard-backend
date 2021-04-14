@@ -13,6 +13,9 @@ const config = {
     sessionExpiresIn: '5m',
   },
   docs: docsConfig,
+  tasks: {
+    listedTasksPerPage: environment === 'test' ? 3 : 10,
+  },
 };
 
 export default config;

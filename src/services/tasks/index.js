@@ -1,9 +1,11 @@
 import mongoose from 'mongoose';
 import * as yup from 'yup';
 
+import config from '~/config';
 import { Task } from '~/models';
 import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
+import { paginateQuery } from '~/utils/mongodb';
 
 export const taskPriorities = ['low', 'high'];
 const taskPriorityOrders = {
@@ -52,21 +54,56 @@ class TasksServices {
     return Task.findOne(filters);
   }
 
-  static findByOwner(owner, options = {}) {
-    const { sortByPriority } = options;
+  static async findByOwner(owner, options = {}) {
+    const { page, sortByPriority } = options;
     const prioritySortingOrder = taskPriorityOrders[sortByPriority];
 
+    const ownerObjectId = mongoose.Types.ObjectId(owner);
+    const filters = { owner: ownerObjectId };
+    const query = TasksServices.#generateListQuery(
+      filters,
+      prioritySortingOrder,
+    );
+
+    return TasksServices.#structureListQueryResults({ query, filters, page });
+  }
+
+  static #generateListQuery(filters, prioritySortingOrder) {
     if (!prioritySortingOrder) {
-      return Task.find({ owner });
+      return Task.find(filters).lean();
     }
 
-    const ownerObjectId = mongoose.Types.ObjectId(owner);
     return Task.aggregate()
-      .match({ owner: ownerObjectId })
+      .match(filters)
       .addFields({
         __order: { $indexOfArray: [prioritySortingOrder, '$priority'] },
       })
-      .sort({ __order: 1 });
+      .sort({ __order: 1, _id: 1 });
+  }
+
+  static async #structureListQueryResults({ query, filters, page }) {
+    if (!page) {
+      return { tasks: await query };
+    }
+
+    return TasksServices.#paginateListQuery({
+      query,
+      page,
+      tasksCount: Task.countDocuments(filters),
+    });
+  }
+
+  static async #paginateListQuery({ query, page, tasksCount }) {
+    const tasksCountAsPromise = Promise.resolve(tasksCount);
+
+    const [tasks, totalTasks] = await Promise.all([
+      paginateQuery(query, page, config.tasks.listedTasksPerPage),
+      tasksCountAsPromise,
+    ]);
+
+    const totalPages = Math.ceil(totalTasks / config.tasks.listedTasksPerPage);
+
+    return { tasks, totalPages };
   }
 
   static existsWithId(taskId, options = {}) {
