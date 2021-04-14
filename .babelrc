@@ -15,8 +15,7 @@
       {
         "alias": {
           "~": "./src",
-          "~tests": "./tests",
-          "~docs": "./docs"
+          "~tests": "./tests"
         }
       }
     ],

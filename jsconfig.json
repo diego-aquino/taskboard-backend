@@ -3,9 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "~tests/*": ["./tests/*"],
-      "~docs": ["./docs"],
-      "~docs/*": ["./docs/*"]
+      "~tests/*": ["./tests/*"]
     }
   },
   "exclude": ["node_modules", "dist"]
