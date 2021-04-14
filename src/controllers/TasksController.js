@@ -54,7 +54,7 @@ class TasksController {
   static async list(request, response, next) {
     try {
       const { accountId } = request.locals;
-      const { sortByPriority } = await TasksController.#validateListQuery(
+      const { page, sortByPriority } = await TasksController.#validateListQuery(
         request.query,
       );
 
@@ -63,12 +63,13 @@ class TasksController {
         throw new AccountNotFoundError();
       }
 
-      const tasks = await TasksServices.findByOwner(accountId, {
+      const { tasks, totalPages } = await TasksServices.findByOwner(accountId, {
+        page,
         sortByPriority,
       });
       const taskViews = TasksViews.renderMany(tasks);
 
-      return response.status(200).json({ tasks: taskViews });
+      return response.status(200).json({ tasks: taskViews, page, totalPages });
     } catch (error) {
       return TasksController.#handleError(error, { response, next });
     }
@@ -76,6 +77,7 @@ class TasksController {
 
   static #validateListQuery(requestQuery) {
     const requestQuerySchema = yup.object({
+      page: yup.number().integer().min(1, 'Invalid field(s).').default(1),
       sortByPriority: yup
         .string()
         .oneOf(['asc', 'desc', undefined], 'Invalid sorting order.'),

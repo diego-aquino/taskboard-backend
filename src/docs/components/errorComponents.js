@@ -19,16 +19,6 @@ const schemas = {
         message: 'Invalid field(s).',
       },
     },
-
-    invalidTaskSortingOrder: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Invalid sorting order.',
-      },
-    },
   },
 
   emailAlreadyInUse: {
