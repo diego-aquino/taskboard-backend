@@ -8,7 +8,9 @@ const accountsPaths = {
         required: true,
         content: {
           'application/json': {
-            schema: { $ref: '#/components/schemas/signup/accountInfo' },
+            schema: {
+              $ref: '#/components/schemas/accounts/signup/newAccountInfo',
+            },
           },
         },
       },
@@ -17,7 +19,9 @@ const accountsPaths = {
           description: 'OK - Conta criada com sucesso',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/signup/successResponse' },
+              schema: {
+                $ref: '#/components/schemas/accounts/signup/successResponse',
+              },
             },
           },
         },
@@ -25,7 +29,10 @@ const accountsPaths = {
           description: 'Bad request - Erro de validação',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/errors/validationError' },
+              schema: {
+                $ref:
+                  '#/components/schemas/errors/validationErrorInvalidOrRequiredFields',
+              },
             },
           },
         },
@@ -51,7 +58,9 @@ const accountsPaths = {
           description: 'OK - Informações da conta retornadas',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/details/successResponse' },
+              schema: {
+                $ref: '#/components/schemas/accounts/details/successResponse',
+              },
             },
           },
         },
@@ -87,7 +96,7 @@ const accountsPaths = {
         required: true,
         content: {
           'application/json': {
-            schema: { $ref: '#/components/schemas/login/credentials' },
+            schema: { $ref: '#/components/schemas/accounts/login/credentials' },
           },
         },
       },
@@ -96,7 +105,9 @@ const accountsPaths = {
           description: 'OK - Credenciais de autenticação retornadas',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/login/successResponse' },
+              schema: {
+                $ref: '#/components/schemas/accounts/login/successResponse',
+              },
             },
           },
         },
@@ -104,7 +115,10 @@ const accountsPaths = {
           description: 'Bad request - Erro de validação',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/errors/validationError' },
+              schema: {
+                $ref:
+                  '#/components/schemas/errors/validationErrorInvalidOrRequiredFields',
+              },
             },
           },
         },
@@ -131,7 +145,7 @@ const accountsPaths = {
         required: true,
         content: {
           'application/json': {
-            schema: { $ref: '#/components/schemas/token/credentials' },
+            schema: { $ref: '#/components/schemas/accounts/token/credentials' },
           },
         },
       },
@@ -140,7 +154,9 @@ const accountsPaths = {
           description: 'OK - Novo token de acesso retornado',
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/token/successResponse' },
+              schema: {
+                $ref: '#/components/schemas/accounts/token/successResponse',
+              },
             },
           },
         },

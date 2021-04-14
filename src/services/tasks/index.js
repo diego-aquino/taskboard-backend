@@ -5,6 +5,7 @@ import { Task } from '~/models';
 import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
 
+export const taskPriorities = ['low', 'high'];
 const taskPriorityOrders = {
   asc: ['low', 'high'],
   desc: ['high', 'low'],
@@ -30,7 +31,7 @@ class TasksServices {
       name: yup.string().required(),
       priority: yup
         .string()
-        .oneOf(['high', 'low'], 'Unknown priority.')
+        .oneOf(taskPriorities, 'Unknown priority.')
         .default('low'),
     });
 

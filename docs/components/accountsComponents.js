@@ -1,6 +1,6 @@
 const schemas = {
   signup: {
-    accountInfo: {
+    newAccountInfo: {
       type: 'object',
       properties: {
         firstName: { type: 'string' },

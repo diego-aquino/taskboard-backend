@@ -1,63 +1,81 @@
 const schemas = {
-  errors: {
-    validationError: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Invalid or missing required field(s).',
-      },
+  validationErrorInvalidOrRequiredFields: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
     },
-
-    emailAlreadyInUse: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Email is already in use.',
-      },
+    example: {
+      message: 'Invalid or missing required field(s).',
     },
+  },
 
-    invalidAccessToken: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Invalid or missing access token.',
-      },
+  validationErrorInvalidFields: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
     },
-
-    invalidRefreshToken: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Invalid or missing refresh token.',
-      },
+    example: {
+      message: 'Invalid field(s).',
     },
+  },
 
-    accountNotFound: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Account not found.',
-      },
+  emailAlreadyInUse: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
     },
+    example: {
+      message: 'Email is already in use.',
+    },
+  },
 
-    invalidLoginCredentials: {
-      type: 'object',
-      properties: {
-        message: { type: 'string' },
-      },
-      example: {
-        message: 'Email and/or password do not match.',
-      },
+  invalidAccessToken: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
+    },
+    example: {
+      message: 'Invalid or missing access token.',
+    },
+  },
+
+  invalidRefreshToken: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
+    },
+    example: {
+      message: 'Invalid or missing refresh token.',
+    },
+  },
+
+  accountNotFound: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
+    },
+    example: {
+      message: 'Account not found.',
+    },
+  },
+
+  taskNotFound: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
+    },
+    example: {
+      message: 'Task not found.',
+    },
+  },
+
+  invalidLoginCredentials: {
+    type: 'object',
+    properties: {
+      message: { type: 'string' },
+    },
+    example: {
+      message: 'Email and/or password do not match.',
     },
   },
 };
