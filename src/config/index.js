@@ -1,4 +1,5 @@
 import generateDatabaseConfig from './database';
+import docsConfig from './docs';
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -11,6 +12,7 @@ const config = {
     refreshSecretKey: process.env.JWT_REFRESH_SECRET_KEY,
     sessionExpiresIn: '5m',
   },
+  docs: docsConfig,
 };
 
 export default config;
