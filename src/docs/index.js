@@ -12,7 +12,7 @@ const docs = {
   info: {
     version: '0.1.0',
     title: 'Taskboard Backend',
-    description: 'Ferramenta de gerenciamento de tarefas.',
+    description: 'Plataforma de gerenciamento de tarefas pessoais.',
     contact: {
       name: 'Diego Aquino',
       email: 'diegocruzdeaquino@gmail.com',
