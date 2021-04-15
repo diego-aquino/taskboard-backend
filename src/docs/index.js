@@ -10,9 +10,9 @@ import servers from './servers';
 const docs = {
   openapi: '3.0.1',
   info: {
-    version: '0.1.0',
+    version: '0.2.0',
     title: 'Taskboard Backend',
-    description: 'Plataforma de gerenciamento de tarefas pessoais.',
+    description: 'Plataforma de gerenciamento de tarefas pessoais',
     contact: {
       name: 'Diego Aquino',
       email: 'diegocruzdeaquino@gmail.com',
