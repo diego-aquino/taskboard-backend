@@ -33,7 +33,7 @@
 
 - Registro de contas (sign up)
 - Autenticação por JWT, com suporte para login, logout e geração de tokens de acesso
-- Suporte para criar, ver, editar, listar e remover tarefas
+- Suporte para criar, ver, editar, remover e listar tarefas (com paginação)
 - Suporte para adicionar prioridades às tarefas e ordená-las de forma ascendente (baixa prioridade - alta prioridade) ou descendente (alta prioridade - baixa prioridade)
 
 ## :gear: Tecnologias
