@@ -8,6 +8,6 @@ export class InvalidTokenError extends JsonWebTokenError {
 
 export class ExpiredTokenError extends TokenExpiredError {
   constructor(tokenName) {
-    super(`Invalid or missing ${tokenName} token.`);
+    super(`Expired ${tokenName} token.`);
   }
 }

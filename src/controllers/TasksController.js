@@ -4,7 +4,7 @@ import AccountsServices from '~/services/accounts';
 import { AccountNotFoundError } from '~/services/accounts/errors';
 import TasksServices from '~/services/tasks';
 import { TaskNotFoundError } from '~/services/tasks/errors';
-import TasksViews from '~/views/TasksViews';
+import { TasksViews } from '~/views';
 import { InvalidObjectId } from '~/validators/errors';
 import { isValidObjectId } from '~/utils/mongodb';
 

@@ -70,7 +70,7 @@ describe('`/accounts/token` endpoint', () => {
     });
   });
 
-  it('should not generate new access tokens to if refresh token is missing or invalid', async () => {
+  it('should not generate new access tokens if refresh token is missing or invalid', async () => {
     const errorResponses = await Promise.all([
       token().send({}),
       token().send({ refreshToken: 'this-is-not-a-refresh-token' }),

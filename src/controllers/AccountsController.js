@@ -10,7 +10,7 @@ import {
 import { AccountsViews } from '~/views';
 
 class AccountsController {
-  static async signUp(request, response, next) {
+  static async signup(request, response, next) {
     try {
       const { firstName, lastName, email, password } = request.body;
       const accountInfo = { firstName, lastName, email, password };
