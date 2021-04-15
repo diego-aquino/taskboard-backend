@@ -23,16 +23,16 @@ function sortTasksByPriority(tasks, { ascending = true }) {
   );
 }
 
-function splitTasksIntoPages(tasks, tasksPerPage) {
+function paginate(elements, elementsPerPage) {
   const pages = [];
 
-  tasks.forEach((task, index) => {
-    const shouldBeOnANewPage = index % tasksPerPage === 0;
+  elements.forEach((element, index) => {
+    const shouldBeOnANewPage = index % elementsPerPage === 0;
     if (shouldBeOnANewPage) {
       pages.push([]);
     }
 
-    pages[pages.length - 1].push(task);
+    pages[pages.length - 1].push(element);
   });
 
   return pages;
@@ -69,12 +69,12 @@ describe('`GET /tasks` endpoint', () => {
     ]);
 
     Object.assign(tasksPages, {
-      unordered: splitTasksIntoPages(createdTasks, tasksPerPage),
-      ascending: splitTasksIntoPages(
+      unordered: paginate(createdTasks, tasksPerPage),
+      ascending: paginate(
         sortTasksByPriority(createdTasks, { ascending: true }),
         tasksPerPage,
       ),
-      descending: splitTasksIntoPages(
+      descending: paginate(
         sortTasksByPriority(createdTasks, { ascending: false }),
         tasksPerPage,
       ),

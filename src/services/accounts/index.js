@@ -17,7 +17,7 @@ class AccountsServices {
 
     const accountWithSameEmailExists = await Account.exists({ email });
     if (accountWithSameEmailExists) {
-      throw new EmailAlreadyInUseError(email);
+      throw new EmailAlreadyInUseError();
     }
 
     const account = await Account.create({
