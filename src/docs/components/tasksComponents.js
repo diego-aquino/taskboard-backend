@@ -77,10 +77,8 @@ const schemas = {
         priority: { $ref: '#/components/schemas/tasks/taskPriority' },
       },
       example: {
-        task: {
-          name: 'Novo nome para a tarefa',
-          priority: 'low',
-        },
+        name: 'Novo nome para a tarefa',
+        priority: 'low',
       },
     },
   },
