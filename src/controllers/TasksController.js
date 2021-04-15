@@ -5,6 +5,8 @@ import { AccountNotFoundError } from '~/services/accounts/errors';
 import TasksServices from '~/services/tasks';
 import { TaskNotFoundError } from '~/services/tasks/errors';
 import TasksViews from '~/views/TasksViews';
+import { InvalidObjectId } from '~/validators/errors';
+import { isValidObjectId } from '~/utils/mongodb';
 
 const { ValidationError } = yup;
 
@@ -29,6 +31,10 @@ class TasksController {
     try {
       const { accountId } = request.locals;
       const { taskId } = request.params;
+
+      if (!isValidObjectId(taskId)) {
+        throw new InvalidObjectId();
+      }
 
       const accountExists = await AccountsServices.existsWithId(accountId);
       if (!accountExists) {
@@ -95,6 +101,10 @@ class TasksController {
       const { taskId } = request.params;
       const update = request.body;
 
+      if (!isValidObjectId(taskId)) {
+        throw new InvalidObjectId();
+      }
+
       const accountExists = await AccountsServices.existsWithId(accountId);
       if (!accountExists) {
         throw new AccountNotFoundError();
@@ -119,6 +129,10 @@ class TasksController {
     try {
       const { accountId } = request.locals;
       const { taskId } = request.params;
+
+      if (!isValidObjectId(taskId)) {
+        throw new InvalidObjectId();
+      }
 
       const accountExists = await AccountsServices.existsWithId(accountId);
       if (!accountExists) {

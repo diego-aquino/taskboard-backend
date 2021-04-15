@@ -63,6 +63,15 @@ describe('`DELETE /tasks/:taskId` endpoint', () => {
     expect(response.body).toEqual({ message: 'Task not found.' });
   });
 
+  it('should not remove a task if the id is invalid', async () => {
+    const response = await removeTask('some-invalid-id').auth(
+      account.accessToken,
+    );
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ message: 'Invalid object id.' });
+  });
+
   it('should not remove a task if the user is not authenticated', async () => {
     const response = await removeTask();
 

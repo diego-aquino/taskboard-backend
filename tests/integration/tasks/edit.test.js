@@ -141,6 +141,15 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
     expect(response.body).toEqual({ message: 'Unknown priority.' });
   });
 
+  it('should not edit a task if the id is invalid', async () => {
+    const response = await editTask('some-invalid-id')
+      .auth(account.accessToken)
+      .send(editFixture);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ message: 'Invalid object id.' });
+  });
+
   it('should not edit a task if the user is not authenticated', async () => {
     const response = await editTask(task.id).send(editFixture);
 

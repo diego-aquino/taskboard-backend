@@ -66,6 +66,13 @@ describe('`GET /tasks/:taskId` endpoint', () => {
     expect(response.body).toEqual({ message: 'Task not found.' });
   });
 
+  it('should not return details of a task if the id is invalid', async () => {
+    const response = await getTask('some-invalid-id').auth(account.accessToken);
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({ message: 'Invalid object id.' });
+  });
+
   it('should not return details of a task if the user is not authenticated', async () => {
     const response = await getTask(task.id);
 
