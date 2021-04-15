@@ -87,12 +87,15 @@ const schemas = {
     type: 'object',
     properties: {
       task: {
-        id: { type: 'string' },
-        name: { type: 'string' },
-        priority: { $ref: '#/components/schemas/tasks/taskPriority' },
-        owner: { type: 'string' },
-        createdAt: { type: 'string' },
-        updatedAt: { type: 'string' },
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          priority: { $ref: '#/components/schemas/tasks/taskPriority' },
+          owner: { type: 'string' },
+          createdAt: { type: 'string' },
+          updatedAt: { type: 'string' },
+        },
       },
     },
     example: {

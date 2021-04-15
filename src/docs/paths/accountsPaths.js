@@ -16,7 +16,7 @@ const accountsPaths = {
       },
       responses: {
         201: {
-          description: 'OK - Conta criada com sucesso',
+          description: 'Created - Conta criada com sucesso',
           content: {
             'application/json': {
               schema: {
@@ -101,8 +101,8 @@ const accountsPaths = {
         },
       },
       responses: {
-        200: {
-          description: 'OK - Credenciais de autenticação criadas',
+        201: {
+          description: 'Created - Credenciais de autenticação criadas',
           content: {
             'application/json': {
               schema: {
@@ -151,8 +151,8 @@ const accountsPaths = {
         },
       },
       responses: {
-        200: {
-          description: 'OK - Novo token de acesso criado',
+        201: {
+          description: 'Created - Novo token de acesso criado',
           content: {
             'application/json': {
               schema: {
@@ -191,7 +191,7 @@ const accountsPaths = {
       security: [{ bearerAuth: [] }],
       responses: {
         204: {
-          description: 'OK - Logout realizado com sucesso',
+          description: 'No content - Logout realizado com sucesso',
         },
         401: {
           description:

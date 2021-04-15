@@ -14,7 +14,7 @@ const tasksPaths = {
       },
       responses: {
         201: {
-          description: 'OK - Tarefa criada com sucesso',
+          description: 'Created - Tarefa criada com sucesso',
           content: {
             'application/json': {
               schema: {
@@ -87,7 +87,7 @@ const tasksPaths = {
           },
         },
         400: {
-          description: 'Bad request - Erro da validação',
+          description: 'Bad request - Erro de validação',
           content: {
             'application/json': {
               schema: {
@@ -138,6 +138,16 @@ const tasksPaths = {
           content: {
             'application/json': {
               schema: { $ref: '#/components/schemas/tasks/taskInfo' },
+            },
+          },
+        },
+        400: {
+          description: 'Bad request - Erro de validação',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/errors/validation/invalidFields',
+              },
             },
           },
         },
@@ -192,7 +202,7 @@ const tasksPaths = {
       },
       responses: {
         204: {
-          description: 'OK - Tarefa editada com sucesso',
+          description: 'No content - Tarefa editada com sucesso',
         },
         400: {
           description: 'Bad request - Erro de validação',
@@ -248,7 +258,17 @@ const tasksPaths = {
       ],
       responses: {
         204: {
-          description: 'OK - Tarefa removida com sucesso',
+          description: 'No content - Tarefa removida com sucesso',
+        },
+        400: {
+          description: 'Bad request - Erro de validação',
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/errors/validation/invalidFields',
+              },
+            },
+          },
         },
         401: {
           description:
