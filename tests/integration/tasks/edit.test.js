@@ -20,6 +20,7 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
   const editFixture = {
     name: 'New task name',
     priority: 'low',
+    isCompleted: true,
   };
 
   const account = {};
@@ -51,6 +52,7 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
       expect.objectContaining({
         name: editFixture.name,
         priority: editFixture.priority,
+        isCompleted: true,
       }),
     );
   });
@@ -67,6 +69,7 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
       expect.objectContaining({
         name: editFixture.name,
         priority: task.priority,
+        isCompleted: task.isCompleted,
       }),
     );
   });
@@ -83,6 +86,24 @@ describe('`PUT /tasks/:taskId` endpoint', () => {
       expect.objectContaining({
         name: task.name,
         priority: editFixture.priority,
+        isCompleted: task.isCompleted,
+      }),
+    );
+  });
+
+  it('should support editing the completion status of a task without affecting other fields', async () => {
+    const response = await editTask(task.id).auth(account.accessToken).send({
+      isCompleted: editFixture.isCompleted,
+    });
+
+    expect(response.status).toBe(204);
+
+    const taskWithEditedPriority = await Task.findById(task.id).lean();
+    expect(taskWithEditedPriority).toEqual(
+      expect.objectContaining({
+        name: task.name,
+        priority: task.priority,
+        isCompleted: editFixture.isCompleted,
       }),
     );
   });

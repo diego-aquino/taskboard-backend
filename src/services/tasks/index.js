@@ -134,6 +134,7 @@ class TasksServices {
     const updateSchema = yup.object({
       name: yup.string().min(1, 'Invalid field(s).'),
       priority: yup.string().oneOf(['high', 'low'], 'Unknown priority.'),
+      isCompleted: yup.boolean(),
     });
 
     return updateSchema.validate(update, {

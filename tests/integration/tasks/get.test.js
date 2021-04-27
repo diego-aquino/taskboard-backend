@@ -39,6 +39,7 @@ describe('`GET /tasks/:taskId` endpoint', () => {
         id: expect.any(String),
         name: task.name,
         priority: task.priority,
+        isCompleted: false,
         owner: account.id,
         createdAt: expect.any(String),
         updatedAt: expect.any(String),

@@ -1,8 +1,24 @@
 class TasksViews {
   static render(task) {
-    const { _id: id, name, priority, owner, createdAt, updatedAt } = task;
+    const {
+      _id: id,
+      name,
+      priority,
+      isCompleted,
+      owner,
+      createdAt,
+      updatedAt,
+    } = task;
 
-    const taskView = { id, name, priority, owner, createdAt, updatedAt };
+    const taskView = {
+      id,
+      name,
+      priority,
+      isCompleted,
+      owner,
+      createdAt,
+      updatedAt,
+    };
     return taskView;
   }
 

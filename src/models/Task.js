@@ -12,6 +12,10 @@ const TaskSchema = new Schema(
       required: true,
       trim: true,
     },
+    isCompleted: {
+      type: Boolean,
+      default: false,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: 'Account',
