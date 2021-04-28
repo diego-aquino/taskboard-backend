@@ -60,22 +60,30 @@ class TasksController {
   static async list(request, response, next) {
     try {
       const { accountId } = request.locals;
-      const { page, sortByPriority } = await TasksController.#validateListQuery(
-        request.query,
-      );
+      const {
+        page,
+        sortByPriority,
+        paginate,
+      } = await TasksController.#validateListQuery(request.query);
 
       const accountExists = await AccountsServices.existsWithId(accountId);
       if (!accountExists) {
         throw new AccountNotFoundError();
       }
 
+      const shouldPaginate = paginate === 'true';
+      const finalPage = shouldPaginate ? page : undefined;
+
       const { tasks, totalPages } = await TasksServices.findByOwner(accountId, {
-        page,
+        page: finalPage,
         sortByPriority,
       });
+
       const taskViews = TasksViews.renderMany(tasks);
 
-      return response.status(200).json({ tasks: taskViews, page, totalPages });
+      return response
+        .status(200)
+        .json({ tasks: taskViews, page: finalPage, totalPages });
     } catch (error) {
       return TasksController.#handleError(error, { response, next });
     }
@@ -83,6 +91,7 @@ class TasksController {
 
   static #validateListQuery(requestQuery) {
     const requestQuerySchema = yup.object({
+      paginate: yup.string().oneOf(['false', 'true']).default('true'),
       page: yup.number().integer().min(1, 'Invalid field(s).').default(1),
       sortByPriority: yup
         .string()
